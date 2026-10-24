@@ -65,6 +65,7 @@
         app:iconTint="?attr/colorOnSurface"
         app:layout_constraintBottom_toTopOf="@id/album_cover_frame"
         app:layout_constraintEnd_toStartOf="@id/playback_speed"
+        app:layout_goneMarginEnd="24dp"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@id/slide_down"
         app:layout_constraintTop_toTopOf="parent"
@@ -89,9 +90,21 @@
             android:id="@+id/full_sheet_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:alpha="0"
             android:contentDescription="@string/dialog_album"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/ic_default_cover" />
+
+        <!-- Gramophone K: play queue instead of album cover (cover stays for color extraction) -->
+        <org.akanework.gramophone.logic.ui.QueueRecyclerView
+            android:id="@+id/k_inline_queue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSurfaceContainerLow"
+            android:clipToPadding="false"
+            android:contentDescription="@string/list"
+            android:paddingVertical="6dp"
+            android:scrollbars="none" />
 
     </com.google.android.material.card.MaterialCardView>
 

@@ -106,15 +106,19 @@ class ViewPager2Adapter(
             // Do not rename entries here, names are written to disk. Order is default tab order
             Songs(R.id.songs, R.string.category_songs),
             Albums(R.id.albums, R.string.category_albums),
-            Artists(R.id.artists, R.string.category_artists),
+            Artists(R.id.artists, R.string.k_tab_artists),
             Genres(R.id.genres, R.string.category_genres),
             Dates(R.id.dates, R.string.category_dates),
-            Folders(R.id.folders, R.string.folders),
+            Folders(R.id.folders, R.string.k_tab_folders),
             FileSystem(R.id.detailed_folders, R.string.filesystem),
             Playlist(R.id.playlists, R.string.category_playlists)
         }
 
-        fun mapSettingToTabList(setting: String): List<Tab?> {
+        // Gramophone K: default tab order; tabs after the empty entry are hidden
+        private const val DEFAULT_TABS = "Playlist,Folders,Artists,Albums,Songs,FileSystem,,Genres,Dates"
+
+        fun mapSettingToTabList(rawSetting: String): List<Tab?> {
+            val setting = rawSetting.ifEmpty { DEFAULT_TABS }
             val stList = if (!setting.isEmpty())
                 setting.split(",").flatMap {
                     if (it.isEmpty())

@@ -18,6 +18,41 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Gramophone K -->
+    <PreferenceCategory
+        android:layout="@layout/preference_category_md"
+        android:title="@string/k_settings_category">
+
+        <ListPreference
+            android:defaultValue="single"
+            android:entries="@array/k_song_click_mode_entries"
+            android:entryValues="@array/k_song_click_mode_values"
+            android:key="k_song_click_mode"
+            android:layout="@layout/preference_basic"
+            android:title="@string/k_song_click_mode"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="k_confirm_replace_queue"
+            android:layout="@layout/preference_switch"
+            android:summary="@string/k_confirm_replace_queue_summary"
+            android:title="@string/k_confirm_replace_queue"
+            android:widgetLayout="@layout/preference_switch_widget"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="2"
+            android:entryValues="@array/k_album_min_songs_values"
+            android:key="k_album_min_songs"
+            android:layout="@layout/preference_basic"
+            android:title="@string/k_album_min_songs"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:layout="@layout/preference_category_md"
         android:title="@string/settings_category_filters">

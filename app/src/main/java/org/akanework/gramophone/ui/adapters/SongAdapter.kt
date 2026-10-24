@@ -42,7 +42,7 @@ import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.requireMediaStoreId
-import org.akanework.gramophone.logic.setMediaItemsSeamlessly
+import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.MediaControllerViewModel
 import org.akanework.gramophone.ui.SongPickerActivity
@@ -218,22 +218,9 @@ class SongAdapter(
             (context as SongPickerActivity).onSelected(item)
             return
         }
-        val mediaController = mainActivity.getPlayer()
         val title = runBlocking { queueTitle!!.first() }
-        mediaController?.apply {
-            val songList = getSongList()
-            // If the currently playing song is also the clicked song, then we continue playing the
-            // song and open full player, but we still replace the list. This is intended to copy
-            // UX of Chinese players that open full player when clicking song, and we don't want
-            // this UX to break if list is different for some reason.
-            val currentItem = currentMediaItem
-            setMediaItemsSeamlessly(songList, position, title)
-            prepare()
-            play()
-            if (currentItem?.mediaId == songList[position].mediaId) {
-                mainActivity.playerBottomSheet.open()
-            }
-        }
+        // Gramophone K: single-song mode and "replace queue?" confirmation
+        GramophoneK.playFromList(mainActivity, getSongList(), position, title)
     }
 
     override fun onMenu(item: MediaItem, popupMenu: PopupMenu) {

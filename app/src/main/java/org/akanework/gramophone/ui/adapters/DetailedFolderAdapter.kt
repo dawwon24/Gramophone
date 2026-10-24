@@ -223,6 +223,7 @@ class DetailedFolderAdapter(
             fileNodePath.collect {
                 withContext(Dispatchers.Main) {
                     folderPopAdapter.enabled = !it.isNullOrEmpty()
+                    onCanGoUpChanged?.invoke()
                 }
             }
         }
@@ -244,6 +245,11 @@ class DetailedFolderAdapter(
     override fun onTabReselected() {
         songAdapter.onTabReselected()
     }
+
+    // Gramophone K: used by AdapterFragment to make back press go to the parent folder
+    var onCanGoUpChanged: (() -> Unit)? = null
+    val canGoUp: Boolean
+        get() = !fileNodePath.replayCache.firstOrNull().isNullOrEmpty()
 
     fun enter(path: String?) {
         val currentPath = fileNodePath.replayCache.firstOrNull() ?: return

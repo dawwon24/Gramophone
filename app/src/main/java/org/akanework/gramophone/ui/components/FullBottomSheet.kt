@@ -242,6 +242,7 @@ class FullBottomSheet
             if (field != value) {
                 field = value
                 if (value == VISIBLE) {
+                    inlineQueue?.scrollToCurrent(false)
                     visibility = visibilityDueToLyrics
                 } else {
                     visibility = value
@@ -271,6 +272,7 @@ class FullBottomSheet
     val bottomSheetFullLyricView: LyricsView by lazy { (parent as ViewGroup).findViewById(R.id.lyric_frame)!! }
     private val progressDrawable: SquigglyProgress
     private var pqs: PlaylistQueueSheet? = null
+    private var inlineQueue: InlineQueueController? = null
 
     init {
         inflate(context, R.layout.full_player, this)
@@ -294,6 +296,7 @@ class FullBottomSheet
         bottomSheetPlaylistButton = findViewById(R.id.playlist)
         bottomSheetLyricButton = findViewById(R.id.lyrics)
         bottomSheetFullQualityDetails = findViewById(R.id.quality_details)
+        inlineQueue = InlineQueueController(activity, findViewById(R.id.k_inline_queue))
         refreshSettings(null)
         prefs.registerOnSharedPreferenceChangeListener(this)
         activity.controllerViewModel.customCommandListeners.addCallback(activity.lifecycle) { _, command, _ ->
@@ -488,9 +491,8 @@ class FullBottomSheet
             }
         }
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            bottomSheetPlaybackSpeedButton.visibility = GONE
-        }
+        // Gramophone K: playback speed button is hidden
+        bottomSheetPlaybackSpeedButton.visibility = GONE
         bottomSheetPlaybackSpeedButton.setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             if (instance != null)

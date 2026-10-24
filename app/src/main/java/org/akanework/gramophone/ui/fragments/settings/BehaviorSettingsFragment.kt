@@ -22,9 +22,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.hasImagePermission
 import org.akanework.gramophone.logic.hasScopedStorageWithMediaTypes
 import org.akanework.gramophone.logic.utils.Flags
@@ -52,6 +54,13 @@ class BehaviorSettingsFragment : BasePreferenceFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_behavior, rootKey)
+        // Gramophone K: labels for album filter values ("1" = show all)
+        findPreference<ListPreference>(GramophoneK.PREF_ALBUM_MIN_SONGS)?.let { p ->
+            p.entries = p.entryValues.map {
+                val n = it.toString().toInt()
+                if (n <= 1) getString(R.string.k_album_min_all) else getString(R.string.k_album_min_n, n)
+            }.toTypedArray()
+        }
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gramophone K custom strings -->
+<resources>
+    <string name="k_tab_folders">폴더</string>
+    <string name="k_tab_artists">가수</string>
+
+    <string name="k_replace_queue_title">\"%1$s\" 재생</string>
+    <string name="k_replace_queue_play_now">지금 재생 (현재 재생 목록 %1$d곡은 사라짐)</string>
+
+    <string name="k_settings_category">Gramophone K</string>
+    <string name="k_song_click_mode">노래를 눌렀을 때</string>
+    <string name="k_song_click_single">그 노래만 재생</string>
+    <string name="k_song_click_list">목록 전체를 그 노래부터 재생</string>
+    <string name="k_confirm_replace_queue">재생 목록 교체 전 확인</string>
+    <string name="k_confirm_replace_queue_summary">음악이 재생 중일 때 다른 목록의 노래를 누르면, 바로 바꾸지 않고 먼저 물어봅니다</string>
+    <string name="k_album_min_songs">앨범 탭: 앨범으로 인정할 최소 곡 수</string>
+    <string name="k_album_min_all">모든 앨범 표시</string>
+    <string name="k_album_min_n">%1$d곡 이상</string>
+</resources>

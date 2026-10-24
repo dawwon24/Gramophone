@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.GramophoneK.filterAlbumsForTab
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.ui.MainActivity
@@ -39,7 +40,9 @@ import java.util.GregorianCalendar
 class AlbumAdapter(
     fragment: Fragment,
     val queueTitle: Flow<String>,
-    liveData: Flow<List<Album>?> = (fragment.requireActivity() as MainActivity).reader.albumListFlow,
+    // Gramophone K: album tab hides loose singles (see GramophoneK.filterAlbumsForTab)
+    liveData: Flow<List<Album>?> = (fragment.requireActivity() as MainActivity).reader.albumListFlow
+        .filterAlbumsForTab(fragment.requireContext()),
     isSubFragment: Int? = null
 ) : BaseAdapter<Album>
     (

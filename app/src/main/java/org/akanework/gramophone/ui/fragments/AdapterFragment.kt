@@ -23,9 +23,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
@@ -63,6 +65,22 @@ class AdapterFragment : BaseFragment(null) {
     private var pendingRequest: Bundle? = null
     private lateinit var intentSender: ActivityResultLauncher<IntentSenderRequest>
 
+    // Gramophone K: in folder tabs, back goes to the parent folder instead of leaving the app
+    private val folderBackCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            (adapter as? DetailedFolderAdapter)?.enter(null)
+        }
+    }
+    private val backStackListener = FragmentManager.OnBackStackChangedListener {
+        updateFolderBackCallback()
+    }
+
+    private fun updateFolderBackCallback() {
+        val folderAdapter = adapter as? DetailedFolderAdapter
+        folderBackCallback.isEnabled = folderAdapter != null && folderAdapter.canGoUp
+                && isResumed && requireActivity().supportFragmentManager.backStackEntryCount == 0
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -86,10 +104,25 @@ class AdapterFragment : BaseFragment(null) {
                         ?: throw IllegalStateException("pendingRequest null, why?"))
                 }
         }
+        (adapter as? DetailedFolderAdapter)?.onCanGoUpChanged = { updateFolderBackCallback() }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, folderBackCallback)
+        requireActivity().supportFragmentManager.addOnBackStackChangedListener(backStackListener)
         return rootView
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateFolderBackCallback()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        updateFolderBackCallback()
+    }
+
     override fun onDestroyView() {
+        requireActivity().supportFragmentManager.removeOnBackStackChangedListener(backStackListener)
+        (adapter as? DetailedFolderAdapter)?.onCanGoUpChanged = null
         adapter.onFullyDrawnListener = null
         super.onDestroyView()
     }

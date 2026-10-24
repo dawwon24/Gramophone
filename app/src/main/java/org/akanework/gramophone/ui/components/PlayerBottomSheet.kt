@@ -164,6 +164,7 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 1f
                     lyricsFrame.alpha = 1f
                     bottomSheetBackCallback!!.isEnabled = true
+                    raiseBackCallback()
                 }
 
                  BottomSheetBehavior.STATE_HALF_EXPANDED -> {
@@ -175,6 +176,7 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 1f
                     lyricsFrame.alpha = 1f
                     bottomSheetBackCallback!!.isEnabled = true
+                    raiseBackCallback()
                 }
 
                 BottomSheetBehavior.STATE_HIDDEN -> {
@@ -206,6 +208,14 @@ class PlayerBottomSheet private constructor(
             fullPlayer.alpha = slideOffset
             lyricsFrame.alpha = slideOffset
         }
+    }
+
+    // Gramophone K: make sure the open player handles back before callbacks registered later
+    // (e.g. folder tab "go to parent folder")
+    private fun raiseBackCallback() {
+        val cb = bottomSheetBackCallback ?: return
+        cb.remove()
+        activity.onBackPressedDispatcher.addCallback(activity, cb)
     }
 
     override fun onAttachedToWindow() {

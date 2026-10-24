@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gramophone K custom strings -->
+<resources>
+    <string name="k_tab_folders">Folders</string>
+    <string name="k_tab_artists">Artists</string>
+
+    <string name="k_replace_queue_title">Play \"%1$s\"?</string>
+    <string name="k_replace_queue_play_now">Play now (replaces current queue of %1$d songs)</string>
+
+    <string name="k_settings_category">Gramophone K</string>
+    <string name="k_song_click_mode">When tapping a song</string>
+    <string name="k_song_click_single">Play only that song</string>
+    <string name="k_song_click_list">Play the whole list from that song</string>
+    <string name="k_confirm_replace_queue">Confirm before replacing queue</string>
+    <string name="k_confirm_replace_queue_summary">While music is playing, tapping a song from another list asks first instead of throwing away the current queue</string>
+    <string name="k_album_min_songs">Album tab: minimum songs per album</string>
+    <string name="k_album_min_all">Show all albums</string>
+    <string name="k_album_min_n">%1$d or more songs</string>
+
+    <string-array name="k_song_click_mode_entries" translatable="false">
+        <item>@string/k_song_click_single</item>
+        <item>@string/k_song_click_list</item>
+    </string-array>
+    <string-array name="k_song_click_mode_values" translatable="false">
+        <item>single</item>
+        <item>list</item>
+    </string-array>
+    <string-array name="k_album_min_songs_values" translatable="false">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>
