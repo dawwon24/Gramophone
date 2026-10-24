@@ -11,7 +11,7 @@
     <string name="k_song_click_single">Play only that song</string>
     <string name="k_song_click_list">Play the whole list from that song</string>
     <string name="k_confirm_replace_queue">Confirm before replacing queue</string>
-    <string name="k_confirm_replace_queue_summary">When there is a queue (also while paused), tapping another song asks first instead of throwing the queue away</string>
+    <string name="k_confirm_replace_queue_summary">Tapping a song asks first: play only it, play all from here, play next or add to queue (also when nothing is playing). These are then left out of the song menu</string>
     <string name="k_album_min_songs">Album tab</string>
     <string name="k_album_min_all">Show all albums</string>
     <string name="k_album_min_n">Whole folder is one album, %1$d+ songs</string>

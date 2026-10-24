@@ -11,7 +11,7 @@
     <string name="k_song_click_single">그 노래만 재생</string>
     <string name="k_song_click_list">목록 전체를 그 노래부터 재생</string>
     <string name="k_confirm_replace_queue">재생 목록 교체 전 확인</string>
-    <string name="k_confirm_replace_queue_summary">재생 목록이 있을 때(일시정지 포함) 다른 노래를 누르면, 바로 바꾸지 않고 먼저 물어봅니다</string>
+    <string name="k_confirm_replace_queue_summary">노래를 누르면 바로 바꾸지 않고 먼저 물어봅니다 (이 곡만 재생, 여기서부터 전체 재생, 다음에 재생, 대기열에 추가 — 재생 중이 아닐 때도). 이 항목들은 곡 메뉴에서 빠집니다</string>
     <string name="k_album_min_songs">앨범 탭 기준</string>
     <string name="k_album_min_all">모든 앨범 표시</string>
     <string name="k_album_min_n">폴더 전체가 한 앨범인 경우만 (%1$d곡 이상)</string>

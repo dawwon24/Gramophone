@@ -50,7 +50,6 @@ import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.KCustomOrder.withCustomOrder
 import org.akanework.gramophone.logic.KSelection
-import org.akanework.gramophone.logic.KTagEditor
 import com.google.android.material.color.MaterialColors
 import android.graphics.drawable.ColorDrawable
 import org.akanework.gramophone.logic.ui.MyRecyclerView
@@ -332,11 +331,15 @@ class SongAdapter(
 
     override fun onMenu(item: MediaItem, popupMenu: PopupMenu) {
         popupMenu.inflate(R.menu.more_menu)
-        // Gramophone K: tapping plays one song (by default), this plays the whole list
-        if (isSubFragment != R.id.songs) {
+        // Gramophone K: tapping a song already offers play only / list from here / play next /
+        // add to queue, so leave them out here. No share; tags are edited in the details screen.
+        if (GramophoneK.songTapAsks(context)) {
+            popupMenu.menu.findItem(R.id.play_next).isVisible = false
+            popupMenu.menu.findItem(R.id.add_to_queue).isVisible = false
+        } else if (isSubFragment != R.id.songs) {
             popupMenu.menu.findItem(R.id.k_play_list_from_here).isVisible = true
         }
-        popupMenu.menu.findItem(R.id.k_edit_tags).isVisible = KTagEditor.isSupported
+        popupMenu.menu.findItem(R.id.share).isVisible = false
 
         popupMenu.setOnMenuItemClickListener { it1 ->
             when (it1.itemId) {
@@ -381,15 +384,6 @@ class SongAdapter(
                         putString("Id", item.mediaMetadata.artistId?.toString())
                         putInt("Item", R.id.artist)
                     }
-                    true
-                }
-
-                // Gramophone K: tag editing
-                R.id.k_edit_tags -> {
-                    KTagEditor.showDialog(
-                        mainActivity, context.getString(R.string.k_edit_song),
-                        listOf(item), KTagEditor.SONG_FIELDS
-                    )
                     true
                 }
 

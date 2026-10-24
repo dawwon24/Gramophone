@@ -95,10 +95,18 @@ object GramophoneK {
     }
 
     /**
+     * True if tapping a song asks what to do (play only it / list from here / play next / add to
+     * queue). The song menu then leaves those entries out.
+     */
+    fun songTapAsks(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            .getBooleanStrict(PREF_CONFIRM_REPLACE_QUEUE, true)
+
+    /**
      * Handles a click on a song in a list.
      *  - "single" mode: queue is replaced by only the clicked song
      *  - "list" mode: queue is replaced by the whole list (upstream behaviour)
-     * If something is playing and the queue would be thrown away, ask first (optional).
+     * Unless turned off, ask first, also when nothing is playing.
      */
     fun playFromList(
         activity: MainActivity,
@@ -112,7 +120,6 @@ object GramophoneK {
         val prefs = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
         val single = !forceList &&
                 prefs.getStringStrict(PREF_SONG_CLICK_MODE, CLICK_MODE_SINGLE) == CLICK_MODE_SINGLE
-        val confirm = prefs.getBooleanStrict(PREF_CONFIRM_REPLACE_QUEUE, true)
         val isCurrent = controller.currentMediaItem?.mediaId == clicked.mediaId
 
         if (single && isCurrent) {
@@ -120,8 +127,6 @@ object GramophoneK {
             activity.playerBottomSheet.open()
             return
         }
-        val queueIsSameList = !single && controller.mediaItemCount == songList.size &&
-                songList.indices.all { controller.getMediaItemAt(it).mediaId == songList[it].mediaId }
 
         fun replace(onlyThisSong: Boolean) {
             if (onlyThisSong) {
@@ -137,24 +142,25 @@ object GramophoneK {
         }
 
         // An explicit "play whole list from here" never asks.
-        // Ask whenever there is a queue to lose, also while paused.
-        if (forceList || !confirm || controller.mediaItemCount == 0 || queueIsSameList) {
+        if (forceList || !songTapAsks(activity)) {
             replace(single)
             return
         }
 
         val songTitle = clicked.mediaMetadata.title ?: ""
         val count = controller.mediaItemCount
+        val items = if (count == 0) arrayOf(
+            activity.getString(R.string.k_song_click_single),
+            activity.getString(R.string.k_play_list_from_here)
+        ) else arrayOf(
+            activity.getString(R.string.k_replace_queue_only_this, count),
+            activity.getString(R.string.k_replace_queue_list_from_here, count),
+            activity.getString(R.string.play_next),
+            activity.getString(R.string.add_to_queue)
+        )
         MaterialAlertDialogBuilder(activity)
             .setTitle(activity.getString(R.string.k_replace_queue_title, songTitle))
-            .setItems(
-                arrayOf(
-                    activity.getString(R.string.k_replace_queue_only_this, count),
-                    activity.getString(R.string.k_replace_queue_list_from_here, count),
-                    activity.getString(R.string.play_next),
-                    activity.getString(R.string.add_to_queue)
-                )
-            ) { _, which ->
+            .setItems(items) { _, which ->
                 when (which) {
                     0 -> replace(true)
                     1 -> replace(false)
