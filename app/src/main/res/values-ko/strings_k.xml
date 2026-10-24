@@ -45,4 +45,7 @@
     <plurals name="k_selection_count">
         <item quantity="other">%d곡 선택됨</item>
     </plurals>
+    <plurals name="k_playlist_duplicates_skipped">
+        <item quantity="other">이미 재생 목록에 있는 %d곡은 빼고 추가했습니다</item>
+    </plurals>
 </resources>

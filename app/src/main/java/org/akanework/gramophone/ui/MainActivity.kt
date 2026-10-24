@@ -82,6 +82,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.akanework.gramophone.BuildConfig
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.enableEdgeToEdgeProperly
 import org.akanework.gramophone.logic.getBooleanStrict
@@ -483,8 +484,17 @@ class MainActivity : BaseActivity() {
                     uriIn) else PlaylistSerializer.Playlist.create()
                 val uri = uriIn ?: ItemManipulator.createPlaylist(this,
                     File(name!!))
+                // Gramophone K: songs already in the playlist are not added again
+                val entries = GramophoneK.distinctPlaylistEntries(readback.entries + songs)
                 ItemManipulator.setPlaylistContent(this, uri, readback
-                    .copy(entries = readback.entries + songs), uriIn == null)
+                    .copy(entries = entries), uriIn == null)
+                val skipped = songs.size - (entries.size -
+                        GramophoneK.distinctPlaylistEntries(readback.entries).size)
+                if (skipped > 0) withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, resources.getQuantityString(
+                        R.plurals.k_playlist_duplicates_skipped, skipped, skipped),
+                        Toast.LENGTH_SHORT).show()
+                }
             } catch (e: Exception) {
                 Log.e("MainActivity", Log.getThrowableString(e)!!)
                 withContext(Dispatchers.Main) {

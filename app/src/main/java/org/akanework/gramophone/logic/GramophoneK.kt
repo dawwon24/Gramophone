@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.MainActivity
 import uk.akane.libphonograph.items.Album
+import uk.akane.libphonograph.manipulator.PlaylistSerializer
 import uk.akane.libphonograph.utils.KTagFix
 
 object GramophoneK {
@@ -164,4 +165,12 @@ object GramophoneK {
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
+
+    /**
+     * Playlist entries without duplicates (same file), keeping the first occurrence. Used when
+     * adding songs to a playlist, so adding a song twice doesn't list it twice.
+     */
+    fun distinctPlaylistEntries(
+        entries: List<PlaylistSerializer.Entry>
+    ): List<PlaylistSerializer.Entry> = entries.distinctBy { it.locations.firstOrNull()?.toString() }
 }
