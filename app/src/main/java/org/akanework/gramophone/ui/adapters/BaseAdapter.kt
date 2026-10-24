@@ -536,9 +536,12 @@ abstract class BaseAdapter<T : Any>(
     protected open fun getPinnedOrder(item: T): Int {
         return 0
     }
+    // Gramophone K: lets AlbumAdapter show "various artists" instead of "unknown artist"
+    protected open fun kNoArtistText(item: T): String = context.getString(R.string.unknown_artist)
+
     private fun subTitleOf(item: T): String {
         return if (sorter.sortingHelper.canGetArtist())
-            sorter.sortingHelper.getArtist(item) ?: context.getString(R.string.unknown_artist)
+            sorter.sortingHelper.getArtist(item) ?: kNoArtistText(item)
         else if (sorter.sortingHelper.canGetSize()) {
             val s = sorter.sortingHelper.getSize(item)
             return context.resources.getQuantityString(

@@ -138,9 +138,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        // Gramophone K: build number from CI, so each build is an update
-        System.getenv("GRAMOPHONE_K_BUILD")?.toIntOrNull()?.let {
-            versionCode = versionCode!! * 10000 + it
+        // Gramophone K: minutes since 2026-01-01 (set by CI and k-test.sh), so CI releases and
+        // local USB installs are both updates of whatever was installed before
+        System.getenv("GRAMOPHONE_K_MINUTES")?.toIntOrNull()?.let {
+            versionCode = versionCode!! * 10_000_000 + it
         }
     }
 

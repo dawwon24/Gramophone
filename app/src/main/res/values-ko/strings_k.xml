@@ -36,4 +36,8 @@
     <string name="k_backup_failed">실패: %1$s</string>
     <string name="k_search_hint">검색</string>
     <string name="k_search_clear">지우기</string>
+    <string name="k_various_artists">여러 아티스트</string>
+    <plurals name="k_folders">
+        <item quantity="other">%d개 폴더</item>
+    </plurals>
 </resources>

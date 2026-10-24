@@ -69,9 +69,9 @@ jobs:
 
       - name: Build signed APK
         if: steps.check.outputs.build == 'true'
-        env:
-          GRAMOPHONE_K_BUILD: ${{ github.run_number }}
         run: |
+          # versionCode = upstream * 10^7 + minutes since 2026-01-01, same as local USB builds (k-test.sh --real)
+          export GRAMOPHONE_K_MINUTES=$(( ($(date +%s) - $(date -d 2026-01-01T00:00:00Z +%s)) / 60 ))
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
           {
             echo "releaseType=GramophoneK"

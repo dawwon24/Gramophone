@@ -73,6 +73,13 @@ class AlbumAdapter(
         return context.getString(R.string.unknown_album)
     }
 
+    // Gramophone K: no album artist because the songs have different artists (soundtracks,
+    // compilations) -> "various artists" instead of "unknown artist"
+    override fun kNoArtistText(item: Album): String =
+        if (item.songList.mapNotNullTo(HashSet()) { it.mediaMetadata.artist?.toString() }.size > 1)
+            context.getString(R.string.k_various_artists)
+        else super.kNoArtistText(item)
+
     override fun onClick(item: Album, position: Int) {
         mainActivity.startFragment(GeneralSubFragment()) {
             putString("Id", item.id?.toString())

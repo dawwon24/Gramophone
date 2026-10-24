@@ -158,8 +158,10 @@ class DetailedFolderAdapter(
             )
         }
     }
+        // Gramophone K: second value = folder has sub folders (before the search filter)
         .combine(kQuery) { list, q ->
-            if (q.isBlank()) list else list.filter { KSearch.matches(it.folderName, q) }
+            Pair(if (q.isBlank()) list else list.filter { KSearch.matches(it.folderName, q) },
+                list.isNotEmpty())
         }
 
     private var folderList: ImmutableList<FileNode> = persistentListOf()
@@ -167,11 +169,10 @@ class DetailedFolderAdapter(
     private val folderPopAdapter: FolderPopAdapter = FolderPopAdapter(this)
     private val folderAdapter: FolderListAdapter = FolderListAdapter(mainActivity, this)
     private val decorAdapter =
-        BaseDecorAdapter<DetailedFolderAdapter>(this, R.plurals.folders_plural)
+        // Gramophone K: "N folders" + search box + sort button, like the artist tab
+        BaseDecorAdapter<DetailedFolderAdapter>(this, R.plurals.k_folders)
             .apply {
-                // Gramophone K: no "N folders" row, the row only holds the search box
                 kSearchQuery = kQuery
-                kOnlySearch = true
             }
     private val songAdapter: SongAdapter =
         SongAdapter(fragment, qTitle, dataFlow.map { it.songList }, folder = true,
@@ -213,7 +214,7 @@ class DetailedFolderAdapter(
         this.recyclerView = recyclerView
         this.scope = CoroutineScope(Dispatchers.Default)
         this.scope!!.launch {
-            folderFlow.collect { newList ->
+            folderFlow.collect { (newList, hasFolders) ->
                 val oldList = folderList
                 val canDiff = this@DetailedFolderAdapter.recyclerView != null
                         && folderAdapter.onFullyDrawnListener == null /* not changing folder */
@@ -222,6 +223,9 @@ class DetailedFolderAdapter(
                 ) else null
                 withContext(Dispatchers.Main) {
                     folderList = newList.toImmutableList()
+                    // Gramophone K: no "0 folders" and folder sort button in a folder that only
+                    // has songs, the row then only holds the search box
+                    decorAdapter.kOnlySearch = !hasFolders
                     if (diffResult != null)
                         diffResult.dispatchUpdatesTo(folderAdapter)
                     else

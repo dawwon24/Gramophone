@@ -52,4 +52,9 @@
         <item>4</item>
         <item>5</item>
     </string-array>
+    <string name="k_various_artists">Various artists</string>
+    <plurals name="k_folders">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
 </resources>
