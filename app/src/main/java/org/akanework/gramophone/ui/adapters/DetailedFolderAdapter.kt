@@ -223,9 +223,12 @@ class DetailedFolderAdapter(
                 ) else null
                 withContext(Dispatchers.Main) {
                     folderList = newList.toImmutableList()
-                    // Gramophone K: no "0 folders" and folder sort button in a folder that only
-                    // has songs, the row then only holds the search box
-                    decorAdapter.kOnlySearch = !hasFolders
+                    // Gramophone K: search box only at the top level; inside a folder the row
+                    // only has "N folders" + sort, and is hidden if there are no sub folders
+                    val atTop = !canGoUp
+                    decorAdapter.kSearchQuery = if (atTop) kQuery else null
+                    decorAdapter.kOnlySearch = atTop && !hasFolders
+                    decorAdapter.kHidden = !atTop && !hasFolders
                     if (diffResult != null)
                         diffResult.dispatchUpdatesTo(folderAdapter)
                     else
