@@ -50,6 +50,7 @@ import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.KCustomOrder.withCustomOrder
 import org.akanework.gramophone.logic.KSelection
+import org.akanework.gramophone.logic.KTagEditor
 import com.google.android.material.color.MaterialColors
 import android.graphics.drawable.ColorDrawable
 import org.akanework.gramophone.logic.ui.MyRecyclerView
@@ -335,6 +336,7 @@ class SongAdapter(
         if (isSubFragment != R.id.songs) {
             popupMenu.menu.findItem(R.id.k_play_list_from_here).isVisible = true
         }
+        popupMenu.menu.findItem(R.id.k_edit_tags).isVisible = KTagEditor.isSupported
 
         popupMenu.setOnMenuItemClickListener { it1 ->
             when (it1.itemId) {
@@ -379,6 +381,15 @@ class SongAdapter(
                         putString("Id", item.mediaMetadata.artistId?.toString())
                         putInt("Item", R.id.artist)
                     }
+                    true
+                }
+
+                // Gramophone K: tag editing
+                R.id.k_edit_tags -> {
+                    KTagEditor.showDialog(
+                        mainActivity, context.getString(R.string.k_edit_song),
+                        listOf(item), KTagEditor.SONG_FIELDS
+                    )
                     true
                 }
 

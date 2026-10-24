@@ -132,6 +132,14 @@ class MainActivity : BaseActivity() {
     val controllerViewModel: MediaControllerViewModel by viewModels()
     val startingActivity =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+    // Gramophone K: write permission for tag editing (see KTagEditor)
+    var kTagWriteCallback: ((Boolean) -> Unit)? = null
+    val kTagWriteRequest =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+            val cb = kTagWriteCallback
+            kTagWriteCallback = null
+            cb?.invoke(it.resultCode == RESULT_OK)
+        }
 
     private val handler = Handler(Looper.getMainLooper())
     private val reportFullyDrawnRunnable = Runnable { if (!ready) reportFullyDrawn() }

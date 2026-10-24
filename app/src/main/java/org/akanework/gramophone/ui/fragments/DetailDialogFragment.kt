@@ -19,6 +19,7 @@ package org.akanework.gramophone.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -35,7 +36,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.KTagEditor
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.getBitrate
 import org.akanework.gramophone.logic.getFile
@@ -64,6 +69,38 @@ class DetailDialogFragment : BaseFragment(false) {
             parentFragmentManager.popBackStack()
             return null
         }
+        // Gramophone K: tag editing, the screen shows the new values after saving
+        val toolbar = rootView.findViewById<MaterialToolbar>(R.id.topAppBar)
+        if (KTagEditor.isSupported) {
+            toolbar.menu.add(R.string.k_edit_song).apply {
+                setIcon(R.drawable.ic_edit)
+                setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                setOnMenuItemClickListener {
+                    val current = runBlocking { mainActivity.reader.idMapFlow.map { it[id] }.first() }
+                        ?: return@setOnMenuItemClickListener true
+                    KTagEditor.showDialog(
+                        mainActivity, getString(R.string.k_edit_song), listOf(current),
+                        KTagEditor.SONG_FIELDS
+                    ) { ok ->
+                        if (!ok) return@showDialog
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            // wait until the library has read the new tags
+                            val flow = mainActivity.reader.idMapFlow.map { it[id] }
+                            val updated = withTimeoutOrNull(5000) {
+                                flow.first { it != null && it.mediaMetadata != current.mediaMetadata }
+                            } ?: flow.first()
+                            if (updated != null) bind(rootView, updated)
+                        }
+                    }
+                    true
+                }
+            }
+        }
+        bind(rootView, mediaItem)
+        return rootView
+    }
+
+    private fun bind(rootView: View, mediaItem: MediaItem) {
         val mediaMetadata = mediaItem.mediaMetadata
         val albumCoverImageView = rootView.findViewById<ImageView>(R.id.album_cover)
         val titleTextView = rootView.findViewById<TextView>(R.id.title)
@@ -87,20 +124,16 @@ class DetailDialogFragment : BaseFragment(false) {
         titleTextView.text = mediaMetadata.title
         artistTextView.text = mediaMetadata.artist
         albumTextView.text = mediaMetadata.albumTitle
-        if (mediaMetadata.albumArtist != null) {
-            albumArtistTextView.text = mediaMetadata.albumArtist
-        }
+        // Gramophone K: rebinding after a tag edit must not keep old values
+        albumArtistTextView.text = mediaMetadata.albumArtist ?: getString(R.string.unknown_artist)
         discNumberTextView.text = mediaMetadata.discNumber?.toLocaleString()
         trackNumberTextView.text = mediaMetadata.trackNumber?.toLocaleString()
         if (hasImprovedMediaStore()) {
-            if (mediaMetadata.genre != null) {
-                genreTextView.text = mediaMetadata.genre
-            }
+            genreTextView.text = mediaMetadata.genre ?: getString(R.string.unknown_genre)
         } else genreBox.visibility = View.GONE
-        if (mediaMetadata.releaseYear != null || mediaMetadata.recordingYear != null) {
-            yearTextView.text =
-                (mediaMetadata.releaseYear ?: mediaMetadata.recordingYear)?.toLocaleString()
-        }
+        yearTextView.text =
+            (mediaMetadata.releaseYear ?: mediaMetadata.recordingYear)?.toLocaleString()
+                ?: getString(R.string.unknown_year)
         mediaMetadata.durationMs?.let { durationTextView.text = convertDurationToTimeStamp(it) }
         mimeTypeTextView.text = mediaItem.localConfiguration?.mimeType ?: "(null)"
         pathTextView.text = mediaItem.getFile()?.path
@@ -116,6 +149,5 @@ class DetailDialogFragment : BaseFragment(false) {
                 }
             }
         }
-        return rootView
     }
 }

@@ -45,3 +45,10 @@
     onMoreData(...);
     onCanWriteMoreData(...);
 }
+
+# Gramophone K: jaudiotagger references desktop java classes it doesn't use on Android
+-dontwarn java.awt.**
+-dontwarn javax.imageio.**
+-dontwarn javax.swing.**
+# Gramophone K: jaudiotagger creates the frame / atom classes via reflection
+-keep class org.jaudiotagger.** { *; }

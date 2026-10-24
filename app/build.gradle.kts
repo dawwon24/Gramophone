@@ -355,6 +355,8 @@ dependencies {
     //noinspection GradleDependency newer versions need java.nio which is api 26+
     //implementation("com.github.albfernandez:juniversalchardet:2.0.3") TODO
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
+    // Gramophone K: tag editing (KTagEditor), needs java.nio.file -> only used on API 30+
+    implementation("net.jthink:jaudiotagger:3.0.1")
     "baselineProfile"(project(":baselineprofile"))
     // --- below does not apply to release builds ---
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")

@@ -21,6 +21,11 @@
         android:id="@+id/rename"
         android:title="@string/rename"
         android:visible="false" />
+    <!-- Gramophone K: tag editing (KTagEditor), shown by the adapters -->
+    <item
+        android:id="@id/k_edit_tags"
+        android:title="@string/k_edit_song"
+        android:visible="false" />
     <item
         android:id="@+id/details"
         android:title="@string/details" />

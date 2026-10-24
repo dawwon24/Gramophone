@@ -67,4 +67,19 @@
         <item quantity="one">%d song was already in the playlist</item>
         <item quantity="other">%d songs were already in the playlist</item>
     </plurals>
+    <string name="k_edit_album">Edit album</string>
+    <string name="k_edit_song">Edit tags</string>
+    <string name="k_tag_save">Save</string>
+    <string name="k_tag_mixed">Songs have different values; leave empty to keep them</string>
+    <string name="k_tag_saving">Saving tags…</string>
+    <string name="k_tag_unsupported">Tag editing needs Android 11 or newer</string>
+    <plurals name="k_tag_saved">
+        <item quantity="one">Saved tags of %d song</item>
+        <item quantity="other">Saved tags of %d songs</item>
+    </plurals>
+    <plurals name="k_tag_failed">
+        <item quantity="one">Could not save %d song</item>
+        <item quantity="other">Could not save %d songs</item>
+    </plurals>
+    <string name="k_tag_unsupported_format">Tag editing is not supported for this file format</string>
 </resources>

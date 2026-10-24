@@ -48,4 +48,17 @@
     <plurals name="k_playlist_duplicates_skipped">
         <item quantity="other">이미 재생 목록에 있는 %d곡은 빼고 추가했습니다</item>
     </plurals>
+    <string name="k_edit_album">앨범 정보 수정</string>
+    <string name="k_edit_song">곡 정보 수정</string>
+    <string name="k_tag_save">저장</string>
+    <string name="k_tag_mixed">곡마다 값이 다릅니다. 비워 두면 그대로 둡니다</string>
+    <string name="k_tag_saving">태그 저장 중…</string>
+    <string name="k_tag_unsupported">태그 수정은 Android 11 이상에서만 됩니다</string>
+    <plurals name="k_tag_saved">
+        <item quantity="other">%d곡의 태그를 저장했습니다</item>
+    </plurals>
+    <plurals name="k_tag_failed">
+        <item quantity="other">%d곡을 저장하지 못했습니다</item>
+    </plurals>
+    <string name="k_tag_unsupported_format">이 파일 형식은 태그를 수정할 수 없습니다</string>
 </resources>

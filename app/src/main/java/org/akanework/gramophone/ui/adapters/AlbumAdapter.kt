@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.GramophoneK.filterAlbumsForTab
+import org.akanework.gramophone.logic.KTagEditor
 import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.ui.MainActivity
@@ -92,7 +93,10 @@ class AlbumAdapter(
         popupMenu.menu.iterator().forEach {
             it.isVisible = it.itemId == R.id.play_next || it.itemId == R.id.add_to_queue
                     || it.itemId == R.id.delete
+                    // Gramophone K: album rename etc. (writes the tags of all songs)
+                    || (it.itemId == R.id.k_edit_tags && KTagEditor.isSupported)
         }
+        popupMenu.menu.findItem(R.id.k_edit_tags).setTitle(R.string.k_edit_album)
         popupMenu.setOnMenuItemClickListener { it1 ->
             when (it1.itemId) {
                 R.id.play_next -> {
@@ -107,6 +111,13 @@ class AlbumAdapter(
                     val mediaController = mainActivity.getPlayer()
                     mediaController?.addMediaItems(
                         item.songList,
+                    )
+                }
+
+                R.id.k_edit_tags -> {
+                    KTagEditor.showDialog(
+                        mainActivity, context.getString(R.string.k_edit_album),
+                        item.songList, KTagEditor.ALBUM_FIELDS
                     )
                 }
 
