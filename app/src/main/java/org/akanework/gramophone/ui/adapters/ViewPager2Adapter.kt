@@ -110,7 +110,7 @@ class ViewPager2Adapter(
             Genres(R.id.genres, R.string.category_genres),
             Dates(R.id.dates, R.string.category_dates),
             Folders(R.id.folders, R.string.k_tab_folders),
-            FileSystem(R.id.detailed_folders, R.string.filesystem),
+            FileSystem(R.id.detailed_folders, R.string.k_tab_filesystem), // Gramophone K: short label
             Playlist(R.id.playlists, R.string.category_playlists)
         }
 

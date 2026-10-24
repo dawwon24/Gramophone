@@ -3,6 +3,7 @@
 <resources>
     <string name="k_tab_folders">Folders</string>
     <string name="k_tab_artists">Artists</string>
+    <string name="k_tab_filesystem">Files</string>
 
     <string name="k_replace_queue_title">Play \"%1$s\"?</string>
 

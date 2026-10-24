@@ -3,6 +3,7 @@
 <resources>
     <string name="k_tab_folders">폴더</string>
     <string name="k_tab_artists">가수</string>
+    <string name="k_tab_filesystem">파일</string>
 
     <string name="k_replace_queue_title">\"%1$s\" 재생</string>
 
