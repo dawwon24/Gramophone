@@ -32,7 +32,7 @@ import org.akanework.gramophone.ui.MainActivity
 
 /**
  * Gramophone K: shows the play queue inside the full player, where the album cover used to be.
- * Same item behaviour as [PlaylistQueueSheet]: tap to play, drag to reorder, swipe/x to remove.
+ * Tap to play. Read-only: reordering / removing is done in [PlaylistQueueSheet].
  */
 class InlineQueueController(
     private val activity: MainActivity,
@@ -46,7 +46,7 @@ class InlineQueueController(
     init {
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = adapter
-        touchHelper.attachToRecyclerView(recyclerView)
+        // Gramophone K: read-only here; reordering / removing only in the full queue sheet
         activity.controllerViewModel.addRecreationalPlayerListener(activity.lifecycle, this) {
             adapter.reload()
             adapter.currentIsPlaying = it.isPlaying
@@ -145,6 +145,8 @@ class InlineQueueController(
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: List<Any?>) {
+            holder.dragHandle.visibility = View.GONE
+            holder.closeButton.visibility = View.GONE
             if (payloads.isNotEmpty()) {
                 if (payloads.none { it is Boolean && it }) {
                     holder.nowPlaying.drawable?.level = if (currentIsPlaying == true) 1 else 0

@@ -48,6 +48,7 @@ import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.comparators.SupportComparator
 import org.akanework.gramophone.logic.emitOrDie
+import org.akanework.gramophone.logic.KSearch
 import org.akanework.gramophone.logic.KCustomOrder
 import org.akanework.gramophone.logic.getStringStrict
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
@@ -103,6 +104,9 @@ class DetailedFolderAdapter(
         else
             Sorter.Type.ByFilePathAscending
     )
+    // Gramophone K: search box filters the current folder (sub folders and songs)
+    override val kQuery = MutableStateFlow("")
+    var kOnQueryCleared: (() -> Unit)? = null
     private var fileNodePath = MutableStateFlow<List<String>?>(savedInstanceState
         ?.getStringArrayList("Path"))
     val qTitle = fileNodePath.map { it?.lastOrNull() ?: "/" }
@@ -155,6 +159,10 @@ class DetailedFolderAdapter(
             )
         }
     }
+        .combine(kQuery) { list, q ->
+            if (q.isBlank()) list else list.filter { KSearch.matches(it.folderName, q) }
+        }
+
     private var folderList: ImmutableList<FileNode> = persistentListOf()
     private var scope: CoroutineScope? = null
     private val folderPopAdapter: FolderPopAdapter = FolderPopAdapter(this)
@@ -165,7 +173,7 @@ class DetailedFolderAdapter(
     private val songAdapter: SongAdapter =
         SongAdapter(fragment, qTitle, dataFlow.map { it.songList }, folder = true,
             rawOrderExposed = Sorter.Type.NaturalOrder,
-            kOrderKey = { KCustomOrder.folderKey(it) }).apply {
+            kOrderKey = { KCustomOrder.folderKey(it) }, kQuery = kQuery).apply {
             onFullyDrawnListener = { reportFullyDrawn() }
             decorAdapter.jumpUpPos = { 0 }
             decorAdapter.offsetPos = { this@DetailedFolderAdapter.decorAdapter.itemCount +
@@ -272,6 +280,10 @@ class DetailedFolderAdapter(
 
     fun enter(path: String?) {
         val currentPath = fileNodePath.replayCache.firstOrNull() ?: return
+        if (kQuery.value.isNotEmpty()) {
+            kQuery.value = ""
+            kOnQueryCleared?.invoke()
+        }
         if (path != null) {
             scrollStack.addLast(currentScroll() ?: (0 to 0))
             pendingScroll = 0 to 0

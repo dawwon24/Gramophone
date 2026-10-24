@@ -34,6 +34,8 @@
     <string name="k_backup_export_done">Backup saved (%1$d playlists).</string>
     <string name="k_backup_import_done">Restored. %1$d playlists created, %2$d skipped (already exist). Please restart the app.</string>
     <string name="k_backup_failed">Failed: %1$s</string>
+    <string name="k_search_hint">Search</string>
+    <string name="k_search_clear">Clear</string>
 
     <string-array name="k_song_click_mode_entries" translatable="false">
         <item>@string/k_song_click_single</item>

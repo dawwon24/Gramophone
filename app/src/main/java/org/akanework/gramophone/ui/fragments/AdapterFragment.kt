@@ -31,11 +31,14 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
+import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
+import org.akanework.gramophone.ui.components.KSearchHeaderAdapter
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
@@ -94,9 +97,29 @@ class AdapterFragment : BaseFragment(null) {
         recyclerView.setRecycledViewPool((requireParentFragment() as ViewPagerFragment).recycledViewPool)
         recyclerView.enableEdgeToEdgePaddingListener()
         adapter = createAdapter(savedInstanceState)
-        recyclerView.adapter = adapter.concatAdapter
         recyclerView.setAppBar((requireParentFragment() as ViewPagerFragment).appBarLayout)
-        recyclerView.fastScroll(adapter, adapter.itemHeightHelper)
+        // Gramophone K: search box on top of artist / album / folder tabs
+        val query = adapter.kQuery
+        val id = arguments?.getInt("ID", -1)
+        if (query != null && id in setOf(R.id.artists, R.id.albums, R.id.folders, R.id.detailed_folders)) {
+            val header = KSearchHeaderAdapter(query)
+            (adapter as? DetailedFolderAdapter)?.kOnQueryCleared = { header.refresh() }
+            recyclerView.adapter = ConcatAdapter(
+                ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
+                header, adapter.concatAdapter
+            )
+            val inner = adapter
+            recyclerView.fastScroll(
+                PopupTextProvider { view, position ->
+                    if (position < 1) "" else inner.getPopupText(view, position - 1)
+                },
+                adapter.itemHeightHelper?.let {
+                    DefaultItemHeightHelper.concatItemHeightHelper(header, { 1 }, it)
+                })
+        } else {
+            recyclerView.adapter = adapter.concatAdapter
+            recyclerView.fastScroll(adapter, adapter.itemHeightHelper)
+        }
         (adapter as? RequestAdapter)?.let { it1 ->
             intentSender =
                 registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
@@ -202,6 +225,9 @@ class AdapterFragment : BaseFragment(null) {
         abstract var layoutType: BaseAdapter.LayoutType?
         abstract fun sort(type: Sorter.Type)
         abstract val itemCountForDecor: Int
+
+        // Gramophone K: list filter text, null if this list has no search box
+        open val kQuery: MutableStateFlow<String>? = null
     }
 
     interface RequestAdapter {

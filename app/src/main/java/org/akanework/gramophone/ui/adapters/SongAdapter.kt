@@ -41,6 +41,7 @@ import kotlinx.coroutines.withContext
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import org.akanework.gramophone.logic.KCustomOrder
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
@@ -79,7 +80,8 @@ class SongAdapter(
     val folder: Boolean = false,
     fallbackContext: AppCompatActivity? = null,
     // Gramophone K: key for a user defined order of this list (folder / artist), see KCustomOrder
-    val kOrderKey: ((List<MediaItem>) -> String?)? = null
+    val kOrderKey: ((List<MediaItem>) -> String?)? = null,
+    kQuery: MutableStateFlow<String> = MutableStateFlow("")
 ) : BaseAdapter<MediaItem>
     (
     fragment,
@@ -98,7 +100,8 @@ class SongAdapter(
     rawOrderExposed = rawOrderExposed,
     allowDiffUtils = allowDiffUtils,
     hasMenu = isSubFragment != R.id.songs,
-    fallbackContext = fallbackContext
+    fallbackContext = fallbackContext,
+    kQuery = kQuery
 ), SharedPreferences.OnSharedPreferenceChangeListener {
 
     init {

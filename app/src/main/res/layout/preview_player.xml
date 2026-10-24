@@ -7,12 +7,14 @@
     android:layout_height="wrap_content"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
+    <!-- Gramophone K: cover hidden (kept invisible, 1dp wide, so the bar keeps its height) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/preview_album_frame"
         style="?materialCardViewFilledStyle"
-        android:layout_width="50dp"
+        android:layout_width="1dp"
         android:layout_height="50dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="23dp"
+        android:visibility="invisible"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="?attr/colorSurfaceContainer"
@@ -35,7 +37,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
+        android:layout_marginStart="0dp"
         android:layout_marginBottom="1dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -63,6 +63,7 @@ import me.zhanghai.android.fastscroll.PopupTextProvider
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import org.akanework.gramophone.logic.dpToPx
+import org.akanework.gramophone.logic.KSearch
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getStringStrict
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
@@ -93,6 +94,7 @@ abstract class BaseAdapter<T : Any>(
     private val canSort: Boolean = true,
     private val hasMenu: Boolean = true,
     private val fallbackContext: AppCompatActivity? = null,
+    override val kQuery: MutableStateFlow<String> = MutableStateFlow(""),
 ) : AdapterFragment.BaseInterface<BaseAdapter.ViewHolder>(), PopupTextProvider, ItemHeightHelper {
 
     override val canChangeLayout = true
@@ -143,6 +145,10 @@ abstract class BaseAdapter<T : Any>(
                 CoroutineScope(Dispatchers.Default),
                 SharingStarted.WhileSubscribed(), replay = 0
             )
+            // Gramophone K: search box filter
+            .combine(kQuery) { l, q ->
+                if (l == null || q.isBlank()) l else l.filter { kMatches(it, q) }
+            }
             .combine(sortType) { it, st ->
                 val l = it ?: emptyList()
                 l to ArrayList(l).apply {
@@ -496,6 +502,10 @@ abstract class BaseAdapter<T : Any>(
 
     protected abstract fun virtualTitleOf(item: T): String
     protected open val kHideListCover = false
+    protected open fun kMatches(item: T, query: String): Boolean =
+        KSearch.matches(sorter.sortingHelper.getTitle(item), query) ||
+                (sorter.sortingHelper.canGetArtist() &&
+                        KSearch.matches(sorter.sortingHelper.getArtist(item), query))
     protected open fun kDragEnabled(): Boolean = false
     protected open fun kStartDrag(holder: ViewHolder) {}
 
