@@ -57,6 +57,11 @@
             android:title="@string/sort_by_size"
             app:showAsAction="never" />
         <item
+            android:id="@+id/k_album_count"
+            android:orderInCategory="8"
+            android:title="@string/k_sort_album_count"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/add_date"
             android:orderInCategory="9"
             android:title="@string/sort_by_add_date"

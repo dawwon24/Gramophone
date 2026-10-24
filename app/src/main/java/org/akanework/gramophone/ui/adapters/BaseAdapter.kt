@@ -146,9 +146,10 @@ abstract class BaseAdapter<T : Any>(
                     val (cmp, reverseFirst) = sorter.getComparator(st)
                     if (reverseFirst) reverse()
                     if (cmp != null) {
+                        // Gramophone K: "unknown" items go to the bottom instead of the top
                         sortWith { o1, o2 ->
-                            if (isPinned(o1) && !isPinned(o2)) -1
-                            else if (!isPinned(o1) && isPinned(o2)) 1
+                            if (isPinned(o1) && !isPinned(o2)) 1
+                            else if (!isPinned(o1) && isPinned(o2)) -1
                             else if (isPinned(o1) && isPinned(o2))
                                 compareBy<T> { getPinnedOrder(it) }.compare(o1, o2)
                             else cmp.compare(o1, o2)

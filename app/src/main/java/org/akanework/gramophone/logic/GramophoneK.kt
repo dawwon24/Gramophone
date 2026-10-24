@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import org.akanework.gramophone.R
 import org.akanework.gramophone.ui.MainActivity
 import uk.akane.libphonograph.items.Album
+import uk.akane.libphonograph.utils.KTagFix
 
 object GramophoneK {
     const val PREF_SONG_CLICK_MODE = "k_song_click_mode"
@@ -56,8 +57,24 @@ object GramophoneK {
         }.distinctUntilChanged()
         return combine(minSongsFlow) { list, minSongs ->
             if (list == null || minSongs <= 1) list
-            else list.filter { it.songList.size >= minSongs && isRealAlbum(it) }
+            else {
+                // A folder only counts as an album if all of its songs are that one album
+                val albumsPerFolder = list.groupingBy { albumFolderOf(it) }.eachCount()
+                list.filter {
+                    val folder = albumFolderOf(it)
+                    folder != null && albumsPerFolder[folder] == 1 &&
+                            it.songList.size >= minSongs && isRealAlbum(it)
+                }
+            }
         }
+    }
+
+    /** The album folder of an album, or null if its songs are spread over several folders. */
+    private fun albumFolderOf(album: Album): String? {
+        val folders = album.songList.mapTo(HashSet()) { song ->
+            song.getFile()?.parentFile?.let { KTagFix.albumFolder(it).absolutePath }
+        }
+        return folders.singleOrNull()
     }
 
     /**
@@ -70,7 +87,7 @@ object GramophoneK {
         val title = album.title?.trim()
         if (title.isNullOrEmpty() || title == "<unknown>") return false
         val looksLikeFolderFallback = album.songList.all {
-            it.getFile()?.parentFile?.name == title
+            it.getFile()?.parentFile?.name?.trim() == title
         }
         if (!looksLikeFolderFallback) return true
         return album.songList.any { (it.mediaMetadata.trackNumber ?: 0) > 0 }
@@ -86,13 +103,14 @@ object GramophoneK {
         activity: MainActivity,
         songList: List<MediaItem>,
         position: Int,
-        title: String
+        title: String,
+        forceList: Boolean = false
     ) {
         val controller = activity.getPlayer() ?: return
         val clicked = songList[position]
         val prefs = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
-        val single = prefs.getStringStrict(PREF_SONG_CLICK_MODE, CLICK_MODE_SINGLE) ==
-                CLICK_MODE_SINGLE
+        val single = !forceList &&
+                prefs.getStringStrict(PREF_SONG_CLICK_MODE, CLICK_MODE_SINGLE) == CLICK_MODE_SINGLE
         val confirm = prefs.getBooleanStrict(PREF_CONFIRM_REPLACE_QUEUE, true)
         val isCurrent = controller.currentMediaItem?.mediaId == clicked.mediaId
 

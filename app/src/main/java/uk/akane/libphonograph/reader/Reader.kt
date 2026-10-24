@@ -70,6 +70,7 @@ import uk.akane.libphonograph.items.modifiedDate
 import uk.akane.libphonograph.manipulator.PlaylistSerializer
 import uk.akane.libphonograph.putIfAbsentSupport
 import uk.akane.libphonograph.toUriCompat
+import uk.akane.libphonograph.utils.KTagFix
 import uk.akane.libphonograph.utils.MiscUtils
 import uk.akane.libphonograph.utils.MiscUtils.findBestAlbumArtist
 import uk.akane.libphonograph.utils.MiscUtils.handleMediaFolder
@@ -198,6 +199,7 @@ internal object Reader {
         val albumMap = if (shouldLoadAlbums) hashMapOf<Long?, MiscUtils.AlbumImpl>() else null
         val artistMap = if (shouldLoadArtists) hashMapOf<Long?, Artist>() else null
         val artistCacheMap = if (shouldLoadAlbums) hashMapOf<String?, Long?>() else null
+        val kArtistIds = hashMapOf<String, Long?>()
         val albumArtistMap = if (shouldLoadAlbums) hashMapOf<Long?, Artist>() else null
         // Note: it has been observed on a user's Pixel(!) that MediaStore assigned 3 different IDs
         // for "Unknown genre" (null genre tag), and genres are simple - like dates - same name
@@ -328,18 +330,26 @@ internal object Reader {
                 // We need to add blacklisted songs to idMap as they can be referenced by playlist
                 if (skip && idMap == null && pathMap == null) continue
                 val id = it.getLong(idColumn)
-                val title = it.getString(titleColumn) ?: path ?: it.getString(fileName)!!
+                // Gramophone K: repair mis-decoded (Shift_JIS / CP949) tags
+                val title = KTagFix.fixMojibake(it.getString(titleColumn))
+                    ?: path ?: it.getString(fileName)!!
                 val artist: String?
                 val hasNoMetadata: Boolean
                 it.getStringOrNullIfThrow(artistColumn).let {
                     hasNoMetadata = it == MediaStore.UNKNOWN_STRING || it == null
-                    artist = if (hasNoMetadata) null else it
+                    artist = if (hasNoMetadata) null else KTagFix.fixMojibake(it)
                 }
-                val album = it.getStringOrNullIfThrow(albumColumn)
-                val albumArtist = it.getStringOrNullIfThrow(albumArtistColumn)
+                val album = KTagFix.fixMojibake(it.getStringOrNullIfThrow(albumColumn))
+                val albumArtist = KTagFix.fixMojibake(it.getStringOrNullIfThrow(albumArtistColumn))
                 val year = it.getIntOrNullIfThrow(yearColumn).let { v -> if (v == 0) null else v }
-                val albumId = it.getLongOrNullIfThrow(albumIdColumn)
-                val artistId = it.getLongOrNullIfThrow(artistIdColumn)
+                // Gramophone K: one album = one album title in one folder (see KTagFix.albumId)
+                val albumId = if (album != null && parent != null) KTagFix.albumId(parent, album)
+                else it.getLongOrNullIfThrow(albumIdColumn)
+                // Gramophone K: same (repaired) artist name = same artist
+                val artistId = it.getLongOrNullIfThrow(artistIdColumn).let { raw ->
+                    if (artist == null) raw
+                    else kArtistIds.getOrPut(artist.trim().lowercase()) { raw }
+                }
                 val mimeType = it.getStringOrNull(mimeTypeColumn) // is null for directories
                 var discNumber = discNumberColumn?.let { col -> it.getIntOrNullIfThrow(col) }
                 var trackNumber = it.getIntOrNullIfThrow(trackNumberColumn)
@@ -347,10 +357,10 @@ internal object Reader {
                     cdTrackNumberColumn?.let { col -> it.getStringOrNullIfThrow(col) }
                 val compilation = compilationColumn?.let { col -> it.getStringOrNullIfThrow(col) }
                 val dateTaken = dateTakenColumn?.let { col -> it.getStringOrNullIfThrow(col) }
-                val composer = composerColumn?.let { col -> it.getStringOrNullIfThrow(col) }
+                val composer = composerColumn?.let { col -> KTagFix.fixMojibake(it.getStringOrNullIfThrow(col)) }
                 val writer = writerColumn?.let { col -> it.getStringOrNullIfThrow(col) }
                 val author = authorColumn?.let { col -> it.getStringOrNullIfThrow(col) }
-                val genre = genreColumn?.let { col -> it.getStringOrNullIfThrow(col) }
+                val genre = genreColumn?.let { col -> KTagFix.fixMojibake(it.getStringOrNullIfThrow(col)) }
                 val addDate = it.getLongOrNullIfThrow(addDateColumn)
                 val modifiedDate = it.getLongOrNullIfThrow(modifiedDateColumn)
                 val dateTakenParsed = if (hasImprovedMediaStore()) {

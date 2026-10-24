@@ -491,12 +491,23 @@ class FullBottomSheet
             }
         }
 
-        // Gramophone K: playback speed button is hidden
-        bottomSheetPlaybackSpeedButton.visibility = GONE
+        // Gramophone K: the playback speed button is reused as "stop and clear queue"
+        bottomSheetPlaybackSpeedButton.setIconResource(R.drawable.baseline_delete_sweep_24)
+        bottomSheetPlaybackSpeedButton.contentDescription = context.getString(R.string.k_clear_queue)
+        TooltipCompat.setTooltipText(bottomSheetPlaybackSpeedButton, context.getString(R.string.k_clear_queue))
         bottomSheetPlaybackSpeedButton.setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
-            if (instance != null)
-                showPlaybackSpeedDialog()
+            val instance = instance ?: return@setOnClickListener
+            MaterialAlertDialogBuilder(wrappedContext ?: context)
+                .setTitle(R.string.k_clear_queue)
+                .setMessage(context.getString(R.string.k_clear_queue_message, instance.mediaItemCount))
+                .setPositiveButton(R.string.k_clear_queue_confirm) { _, _ ->
+                    minimize?.invoke()
+                    instance.stop()
+                    instance.clearMediaItems()
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
         }
 
         bottomSheetFavoriteButton.addOnCheckedChangeListener(this)

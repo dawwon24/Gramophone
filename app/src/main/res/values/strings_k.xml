@@ -13,9 +13,16 @@
     <string name="k_song_click_list">Play the whole list from that song</string>
     <string name="k_confirm_replace_queue">Confirm before replacing queue</string>
     <string name="k_confirm_replace_queue_summary">While music is playing, tapping a song from another list asks first instead of throwing away the current queue</string>
-    <string name="k_album_min_songs">Album tab: minimum songs per album</string>
+    <string name="k_album_min_songs">Album tab</string>
     <string name="k_album_min_all">Show all albums</string>
-    <string name="k_album_min_n">%1$d or more songs</string>
+    <string name="k_album_min_n">Whole folder is one album, %1$d+ songs</string>
+
+    <string name="k_clear_queue">Stop and clear queue</string>
+    <string name="k_clear_queue_message">Stop playback and remove all %1$d songs from the queue?</string>
+    <string name="k_clear_queue_confirm">Clear</string>
+    <string name="k_play_list_from_here">Play whole list from here</string>
+    <string name="k_sort_song_count">Song count</string>
+    <string name="k_sort_album_count">Album count</string>
 
     <string-array name="k_song_click_mode_entries" translatable="false">
         <item>@string/k_song_click_single</item>

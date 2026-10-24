@@ -89,6 +89,7 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
                 Pair(R.id.album_artist_year, Sorter.Type.ByAlbumArtistYearAscending),
                 Pair(R.id.album_year, Sorter.Type.ByAlbumYearDescending),
                 Pair(R.id.size, Sorter.Type.BySizeDescending),
+                Pair(R.id.k_album_count, Sorter.Type.ByAlbumSizeDescending),
                 Pair(R.id.add_date, Sorter.Type.ByAddDateDescending),
                 Pair(R.id.release_date, Sorter.Type.ByReleaseDateDescending),
                 Pair(R.id.mod_date, Sorter.Type.ByModifiedDateDescending),

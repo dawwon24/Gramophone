@@ -29,6 +29,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -251,13 +252,29 @@ class DetailedFolderAdapter(
     val canGoUp: Boolean
         get() = !fileNodePath.replayCache.firstOrNull().isNullOrEmpty()
 
+    // Gramophone K: remember scroll position per folder level, restore it when going back up
+    private val scrollStack = ArrayDeque<Pair<Int, Int>>()
+    private var pendingScroll: Pair<Int, Int>? = null
+
+    private fun currentScroll(): Pair<Int, Int>? {
+        val rv = recyclerView ?: return null
+        val lm = rv.layoutManager as? LinearLayoutManager ?: return null
+        val pos = lm.findFirstVisibleItemPosition()
+        if (pos == RecyclerView.NO_POSITION) return null
+        val top = lm.findViewByPosition(pos)?.top ?: 0
+        return pos to (top - rv.paddingTop)
+    }
+
     fun enter(path: String?) {
         val currentPath = fileNodePath.replayCache.firstOrNull() ?: return
         if (path != null) {
+            scrollStack.addLast(currentScroll() ?: (0 to 0))
+            pendingScroll = 0 to 0
             update(false) {
                 fileNodePath.emitOrDie(currentPath + path)
             }
         } else if (currentPath.isNotEmpty()) {
+            pendingScroll = scrollStack.removeLastOrNull()
             update(true) {
                 // Remove last
                 fileNodePath.emitOrDie(currentPath.subList(0, currentPath.size - 1))
@@ -308,6 +325,11 @@ class DetailedFolderAdapter(
                     if (songAdapter.onFullyDrawnListener != null)
                         throw IllegalStateException("unexpected onFullyDrawnListener")
                     val next = {
+                        pendingScroll?.let { (pos, offset) ->
+                            (it.layoutManager as? LinearLayoutManager)
+                                ?.scrollToPositionWithOffset(pos, offset)
+                        }
+                        pendingScroll = null
                         it.alpha = 1f
                         it.itemAnimator = DefaultItemAnimator()
                         it.startAnimation(

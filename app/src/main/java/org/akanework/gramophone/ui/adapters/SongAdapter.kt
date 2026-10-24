@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.net.Uri
 import android.view.View
+import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
@@ -173,7 +174,7 @@ class SongAdapter(
         super.onAttachedToRecyclerView(recyclerView)
         if (folder) {
             prefs.registerOnSharedPreferenceChangeListener(this)
-            showFileNames = prefs.getBooleanStrict("show_file_names", true)
+            showFileNames = prefs.getBooleanStrict("show_file_names", false)
         }
     }
 
@@ -186,7 +187,7 @@ class SongAdapter(
     @SuppressLint("NotifyDataSetChanged")
     override fun onSharedPreferenceChanged(prefs: SharedPreferences?, key: String?) {
         if ((key == null || key == "show_file_names") && folder) {
-            showFileNames = this.prefs.getBooleanStrict("show_file_names", true)
+            showFileNames = this.prefs.getBooleanStrict("show_file_names", false)
             notifyDataSetChanged()
         }
     }
@@ -210,7 +211,7 @@ class SongAdapter(
     }
 
     override fun titleOf(item: MediaItem): String? {
-        return if (showFileNames) item.getFile()?.name else super.titleOf(item)
+        return if (showFileNames) item.getFile()?.nameWithoutExtension else super.titleOf(item)
     }
 
     override fun onClick(item: MediaItem, position: Int) {
@@ -225,9 +226,25 @@ class SongAdapter(
 
     override fun onMenu(item: MediaItem, popupMenu: PopupMenu) {
         popupMenu.inflate(R.menu.more_menu)
+        // Gramophone K: tapping plays one song (by default), this plays the whole list
+        if (isSubFragment != R.id.songs) {
+            popupMenu.menu.add(Menu.NONE, R.id.k_play_list_from_here, 0,
+                R.string.k_play_list_from_here)
+        }
 
         popupMenu.setOnMenuItemClickListener { it1 ->
             when (it1.itemId) {
+                R.id.k_play_list_from_here -> {
+                    val songList = getSongList()
+                    val pos = songList.indexOfFirst { it === item }
+                        .takeIf { it != -1 } ?: songList.indexOfFirst { it.mediaId == item.mediaId }
+                    if (pos != -1) {
+                        val title = runBlocking { queueTitle!!.first() }
+                        GramophoneK.playFromList(mainActivity, songList, pos, title, forceList = true)
+                    }
+                    true
+                }
+
                 R.id.play_next -> {
                     val mediaController = mainActivity.getPlayer()
                     mediaController?.addMediaItem(

@@ -160,6 +160,8 @@ class ArtistAdapter(
         override fun onSortButtonPressed(popupMenu: PopupMenu) {
             popupMenu.menu.findItem(R.id.album_artist_checkbox).isVisible = true
             popupMenu.menu.findItem(R.id.album_artist_checkbox).isChecked = adapter.isAlbumArtist
+            // Gramophone K: "size" means song count here
+            popupMenu.menu.findItem(R.id.size).setTitle(R.string.k_sort_song_count)
         }
 
         override fun onExtraMenuButtonPressed(menuItem: MenuItem): Boolean {
