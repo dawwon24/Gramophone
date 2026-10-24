@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/decor_height">
+    android:layout_height="@dimen/decor_height"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/song_counter"
@@ -16,6 +18,57 @@
         android:textSize="15sp"
         app:textFontWeight="600"
         tools:text="0 Song" />
+
+    <!-- Gramophone K: search box in the free space of this row (invisible = just a spacer) -->
+    <LinearLayout
+        android:id="@+id/k_search_box"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="4dp"
+        android:layout_weight="1"
+        android:background="@drawable/k_search_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="2dp"
+        android:visibility="invisible">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            app:srcCompat="@drawable/ic_search"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+        <EditText
+            android:id="@+id/k_search_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:autofillHints=""
+            android:background="@null"
+            android:contentDescription="@string/k_search_hint"
+            android:imeOptions="actionSearch|flagNoExtractUi"
+            android:inputType="text"
+            android:paddingVertical="0dp"
+            android:singleLine="true"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp" />
+
+        <ImageButton
+            android:id="@+id/k_search_clear"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/k_search_clear"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_close"
+            app:tint="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -139,4 +192,4 @@
 
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>

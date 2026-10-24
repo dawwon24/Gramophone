@@ -123,11 +123,11 @@ object KSearch {
         return sb.toString()
     }
 
-    /** Loose form so that "spitz" ~ "supittsu": no double letters, tsu/tz/z -> s, drop vowels after the first letter. */
+    /** Loose form so that "spit", "spitz" ~ "supittsu": no double letters, tsu/tz -> ts, z -> s, drop vowels after the first letter. */
     private fun loose(s: String): String {
         val doubles = Regex("(.)\\1+")
         var t = s.lowercase().replace(doubles, "$1")
-        t = t.replace("tsu", "s").replace("tz", "s").replace("ts", "s").replace("z", "s")
+        t = t.replace("tsu", "ts").replace("tz", "ts").replace("z", "s")
         t = t.replace(doubles, "$1")
         return t.firstOrNull()?.let { first ->
             first + t.drop(1).filterNot { it in "aeiou" }

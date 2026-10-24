@@ -34,6 +34,6 @@
     <string name="k_backup_export_done">백업했습니다 (재생 목록 %1$d개).</string>
     <string name="k_backup_import_done">복원했습니다. 재생 목록 %1$d개 생성, %2$d개는 이미 있어서 건너뜀. 앱을 다시 시작하세요.</string>
     <string name="k_backup_failed">실패: %1$s</string>
-    <string name="k_search_hint">검색 (초성, 로마자도 가능)</string>
+    <string name="k_search_hint">검색</string>
     <string name="k_search_clear">지우기</string>
 </resources>

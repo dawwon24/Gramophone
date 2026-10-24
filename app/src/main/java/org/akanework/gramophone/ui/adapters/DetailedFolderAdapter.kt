@@ -106,7 +106,6 @@ class DetailedFolderAdapter(
     )
     // Gramophone K: search box filters the current folder (sub folders and songs)
     override val kQuery = MutableStateFlow("")
-    var kOnQueryCleared: (() -> Unit)? = null
     private var fileNodePath = MutableStateFlow<List<String>?>(savedInstanceState
         ?.getStringArrayList("Path"))
     val qTitle = fileNodePath.map { it?.lastOrNull() ?: "/" }
@@ -169,7 +168,11 @@ class DetailedFolderAdapter(
     private val folderAdapter: FolderListAdapter = FolderListAdapter(mainActivity, this)
     private val decorAdapter =
         BaseDecorAdapter<DetailedFolderAdapter>(this, R.plurals.folders_plural)
-            .apply { kHidden = true } // Gramophone K: no "N folders" row
+            .apply {
+                // Gramophone K: no "N folders" row, the row only holds the search box
+                kSearchQuery = kQuery
+                kOnlySearch = true
+            }
     private val songAdapter: SongAdapter =
         SongAdapter(fragment, qTitle, dataFlow.map { it.songList }, folder = true,
             rawOrderExposed = Sorter.Type.NaturalOrder,
@@ -182,14 +185,15 @@ class DetailedFolderAdapter(
     override val concatAdapter: ConcatAdapter =
         ConcatAdapter(
             ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
-            decorAdapter, this, folderPopAdapter, folderAdapter, songAdapter.concatAdapter
+            // Gramophone K: "<- folder name" header first, then the search row
+            folderPopAdapter, decorAdapter, this, folderAdapter, songAdapter.concatAdapter
         )
     override val itemHeightHelper by lazy {
         DefaultItemHeightHelper.concatItemHeightHelper(
-            decorAdapter, { decorAdapter.itemCount },
+            folderPopAdapter, { folderPopAdapter.itemCount },
             DefaultItemHeightHelper.concatItemHeightHelper(
-                folderPopAdapter,
-                { folderPopAdapter.itemCount },
+                decorAdapter,
+                { decorAdapter.itemCount },
                 DefaultItemHeightHelper.concatItemHeightHelper(
                     folderAdapter,
                     { folderAdapter.itemCount }, songAdapter.itemHeightHelper
@@ -282,7 +286,7 @@ class DetailedFolderAdapter(
         val currentPath = fileNodePath.replayCache.firstOrNull() ?: return
         if (kQuery.value.isNotEmpty()) {
             kQuery.value = ""
-            kOnQueryCleared?.invoke()
+            decorAdapter.updateSongCounter() // rebinds the search box
         }
         if (path != null) {
             scrollStack.addLast(currentScroll() ?: (0 to 0))

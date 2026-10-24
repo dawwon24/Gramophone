@@ -91,10 +91,6 @@ class CustomGridLayoutManager(
                             spanCount
                         }
 
-                        is KSearchHeaderAdapter -> { // Gramophone K
-                            spanCount
-                        }
-
                         is BaseAdapter<*> -> {
                             adapter.getSpanSize()
                         }
@@ -113,10 +109,6 @@ class CustomGridLayoutManager(
                         }
 
                         is DetailedFolderAdapter.FolderCardAdapter -> {
-                            0
-                        }
-
-                        is KSearchHeaderAdapter -> { // Gramophone K
                             0
                         }
 

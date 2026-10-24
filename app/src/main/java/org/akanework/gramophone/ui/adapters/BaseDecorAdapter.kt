@@ -32,6 +32,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageButton
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.doAfterTextChanged
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.KCustomOrder
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
@@ -56,13 +64,53 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
 
     // Gramophone K: hide this row completely (e.g. "0 folders" row in folder tabs)
     var kHidden = false
+    // Gramophone K: search box in this row; kOnlySearch hides counter and buttons
+    var kSearchQuery: MutableStateFlow<String>? = null
+    var kOnlySearch = false
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): ViewHolder {
         val view = adapter.layoutInflater.inflate(R.layout.general_decor, parent, false)
-        return ViewHolder(view)
+        val holder = ViewHolder(view)
+        holder.kSearchText.doAfterTextChanged {
+            val s = it?.toString() ?: ""
+            holder.kSearchClear.visibility = if (s.isEmpty()) View.GONE else View.VISIBLE
+            if (!holder.kBinding) holder.kQuery?.value = s
+        }
+        holder.kSearchText.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                v.context.getSystemService(InputMethodManager::class.java)
+                    ?.hideSoftInputFromWindow(v.windowToken, 0)
+                v.clearFocus()
+                true
+            } else false
+        }
+        holder.kSearchClear.setOnClickListener { holder.kSearchText.setText("") }
+        return holder
+    }
+
+    // Gramophone K: view holders are shared between lists, so (re)bind the search target here
+    private fun bindSearch(holder: ViewHolder) {
+        val q = kSearchQuery
+        holder.kQuery = q
+        holder.kSearchBox.visibility = if (q != null) View.VISIBLE else View.INVISIBLE
+        val text = q?.value ?: ""
+        if (holder.kSearchText.text.toString() != text) {
+            holder.kBinding = true
+            holder.kSearchText.setText(text)
+            holder.kBinding = false
+        }
+        holder.counter.visibility = if (kOnlySearch) View.GONE else View.VISIBLE
+        holder.kSearchBox.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = if (kOnlySearch) 20.dpToPx(context) else 16.dpToPx(context)
+        }
+        if (kOnlySearch) {
+            holder.sortButton.visibility = View.GONE
+            holder.playAll.visibility = View.GONE
+            holder.shuffleAll.visibility = View.GONE
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -260,6 +308,7 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
         // Gramophone K: jump up/down buttons are hidden
         holder.jumpUp.visibility = View.GONE
         holder.jumpDown.visibility = View.GONE
+        bindSearch(holder)
     }
 
     fun goToPlayingSong() {
@@ -270,6 +319,7 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
     }
 
     override fun onViewRecycled(holder: ViewHolder) {
+        holder.kQuery = null
         holder.sortButton.setOnClickListener(null)
         holder.playAll.setOnClickListener(null)
         holder.shuffleAll.setOnClickListener(null)
@@ -330,10 +380,17 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
         val jumpUp: MaterialButton = view.findViewById(R.id.jumpUp)
         val jumpDown: MaterialButton = view.findViewById(R.id.jumpDown)
         val counter: TextView = view.findViewById(R.id.song_counter)
+        val kSearchBox: View = view.findViewById(R.id.k_search_box)
+        val kSearchText: EditText = view.findViewById(R.id.k_search_text)
+        val kSearchClear: ImageButton = view.findViewById(R.id.k_search_clear)
+        var kQuery: MutableStateFlow<String>? = null
+        var kBinding = false
     }
 
     fun updateSongCounter() {
-        notifyItemChanged(0)
+        // Gramophone K: with a payload the same view holder is rebound (no change animation
+        // with a new holder), so a focused search box keeps focus while typing
+        notifyItemChanged(0, true)
     }
 
     override fun getItemHeightFromZeroTo(to: Int): Int {

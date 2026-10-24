@@ -56,8 +56,7 @@ class GridPaddingDecoration(context: Context) : RecyclerView.ItemDecoration() {
             }
             throw IllegalStateException("can't find desired adapter?")
         }
-        if (adapter is BaseDecorAdapter<*> || adapter is DetailedFolderAdapter.FolderCardAdapter
-            || adapter is KSearchHeaderAdapter /* Gramophone K */) {
+        if (adapter is BaseDecorAdapter<*> || adapter is DetailedFolderAdapter.FolderCardAdapter) {
             return
         }
         if (adapter !is BaseAdapter<*>) {

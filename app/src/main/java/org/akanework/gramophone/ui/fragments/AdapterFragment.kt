@@ -37,8 +37,6 @@ import kotlinx.coroutines.flow.flowOf
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
-import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
-import org.akanework.gramophone.ui.components.KSearchHeaderAdapter
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.adapters.AlbumAdapter
@@ -98,28 +96,14 @@ class AdapterFragment : BaseFragment(null) {
         recyclerView.enableEdgeToEdgePaddingListener()
         adapter = createAdapter(savedInstanceState)
         recyclerView.setAppBar((requireParentFragment() as ViewPagerFragment).appBarLayout)
-        // Gramophone K: search box on top of artist / album / folder tabs
-        val query = adapter.kQuery
+        // Gramophone K: search box in the counter row of artist / album tabs
+        // (folder tabs set it up themselves)
         val id = arguments?.getInt("ID", -1)
-        if (query != null && id in setOf(R.id.artists, R.id.albums, R.id.folders, R.id.detailed_folders)) {
-            val header = KSearchHeaderAdapter(query)
-            (adapter as? DetailedFolderAdapter)?.kOnQueryCleared = { header.refresh() }
-            recyclerView.adapter = ConcatAdapter(
-                ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
-                header, adapter.concatAdapter
-            )
-            val inner = adapter
-            recyclerView.fastScroll(
-                PopupTextProvider { view, position ->
-                    if (position < 1) "" else inner.getPopupText(view, position - 1)
-                },
-                adapter.itemHeightHelper?.let {
-                    DefaultItemHeightHelper.concatItemHeightHelper(header, { 1 }, it)
-                })
-        } else {
-            recyclerView.adapter = adapter.concatAdapter
-            recyclerView.fastScroll(adapter, adapter.itemHeightHelper)
+        if (id == R.id.artists || id == R.id.albums) {
+            (adapter as? BaseAdapter<*>)?.let { it.decorAdapter.kSearchQuery = it.kQuery }
         }
+        recyclerView.adapter = adapter.concatAdapter
+        recyclerView.fastScroll(adapter, adapter.itemHeightHelper)
         (adapter as? RequestAdapter)?.let { it1 ->
             intentSender =
                 registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
