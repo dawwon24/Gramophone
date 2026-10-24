@@ -1,0 +1,101 @@
+name: Gramophone K release
+# Applies the custom changes on top of the latest Gramophone release, builds a signed APK
+# and publishes it as a GitHub release (picked up by Obtainium).
+# Release tags are <upstream tag>-k<run number>, e.g. 1.1.2-k12
+
+on:
+  schedule:
+    - cron: '30 18 * * *' # daily, 03:30 KST
+  push:
+    branches: [ custom ]
+    paths: [ 'app/**', 'hificore/**', '.github/workflows/gramophone-k-release.yml' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gramophone-k-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: custom
+          fetch-depth: 0
+
+      - name: Check for new upstream release
+        id: check
+        run: |
+          git remote add upstream https://github.com/FoedusProgramme/Gramophone.git
+          git fetch upstream --tags --quiet
+          latest=$(gh release view -R FoedusProgramme/Gramophone --json tagName -q .tagName)
+          last=$(gh release list -R "$GITHUB_REPOSITORY" -L 1 --exclude-drafts --json tagName -q '.[0].tagName' || true)
+          echo "Latest upstream: $latest, last own release: $last"
+          echo "upstream=$latest" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${last%-k*}" = "$latest" ]; then
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply custom changes onto upstream release
+        if: steps.check.outputs.build == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          latest="${{ steps.check.outputs.upstream }}"
+          base=$(git describe --tags --abbrev=0 --match '[0-9]*' --exclude '*-k*' HEAD)
+          echo "Custom branch base: $base"
+          if [ "$latest" != "$base" ]; then
+            git rebase --onto "$latest" "$base" HEAD
+          fi
+          git submodule update --init --recursive
+
+      - name: Set up JDK
+        if: steps.check.outputs.build == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.check.outputs.build == 'true'
+
+      - name: Build signed APK
+        if: steps.check.outputs.build == 'true'
+        env:
+          GRAMOPHONE_K_BUILD: ${{ github.run_number }}
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.jks"
+          {
+            echo "releaseType=GramophoneK"
+            echo "appIdOverride=org.akanework.gramophone.custom"
+            echo "versionNameSuffixOverride=-k${{ github.run_number }}"
+          } > package.properties
+          mkdir -p ~/.gradle
+          {
+            echo "AKANE_RELEASE_STORE_FILE=$RUNNER_TEMP/release.jks"
+            echo "AKANE_RELEASE_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}"
+            echo "AKANE_RELEASE_KEY_ALIAS=${{ secrets.KEY_ALIAS }}"
+            echo "AKANE_RELEASE_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}"
+          } > ~/.gradle/gradle.properties
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease
+          rm "$RUNNER_TEMP/release.jks" ~/.gradle/gradle.properties
+
+      - name: Publish release
+        if: steps.check.outputs.build == 'true'
+        run: |
+          apk=$(ls app/build/outputs/apk/release/*-release.apk | head -n 1)
+          version=$(basename "$apk" | sed -E 's/^Gramophone-(.*)-release\.apk$/\1/')
+          tag="${{ steps.check.outputs.upstream }}-k${{ github.run_number }}"
+          cp "$apk" "Gramophone-K_${version}.apk"
+          gh release create "$tag" "Gramophone-K_${version}.apk" -R "$GITHUB_REPOSITORY" --target custom \
+            --title "Gramophone K ${version}" \
+            --notes "Based on upstream ${{ steps.check.outputs.upstream }}."

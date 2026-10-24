@@ -138,6 +138,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        // Gramophone K: build number from CI, so each build is an update
+        System.getenv("GRAMOPHONE_K_BUILD")?.toIntOrNull()?.let {
+            versionCode = versionCode!! * 10000 + it
+        }
     }
 
     buildTypes {
