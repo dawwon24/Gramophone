@@ -19,6 +19,7 @@
     <string name="k_clear_queue">Stop and clear queue</string>
     <string name="k_clear_queue_message">Stop playback and remove all %1$d songs from the queue?</string>
     <string name="k_clear_queue_confirm">Clear</string>
+    <string name="k_play_only_this">Play only this song</string>
     <string name="k_play_list_from_here">Play all from here</string>
     <string name="k_sort_song_count">Song count</string>
     <string name="k_sort_album_count">Album count</string>

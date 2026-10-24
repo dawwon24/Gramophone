@@ -150,7 +150,7 @@ object GramophoneK {
         val songTitle = clicked.mediaMetadata.title ?: ""
         val count = controller.mediaItemCount
         val items = if (count == 0) arrayOf(
-            activity.getString(R.string.k_song_click_single),
+            activity.getString(R.string.k_play_only_this),
             activity.getString(R.string.k_play_list_from_here)
         ) else arrayOf(
             activity.getString(R.string.k_replace_queue_only_this, count),
