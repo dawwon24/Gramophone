@@ -11,7 +11,7 @@
     <string name="k_song_click_single">Play only that song</string>
     <string name="k_song_click_list">Play the whole list from that song</string>
     <string name="k_confirm_replace_queue">Confirm before replacing queue</string>
-    <string name="k_confirm_replace_queue_summary">While music is playing, tapping a song from another list asks first instead of throwing away the current queue</string>
+    <string name="k_confirm_replace_queue_summary">When there is a queue (also while paused), tapping another song asks first instead of throwing the queue away</string>
     <string name="k_album_min_songs">Album tab</string>
     <string name="k_album_min_all">Show all albums</string>
     <string name="k_album_min_n">Whole folder is one album, %1$d+ songs</string>
@@ -26,10 +26,7 @@
     <string name="k_replace_queue_only_this">Play only this song (replaces current %1$d songs)</string>
     <string name="k_replace_queue_list_from_here">Play all from here (replaces current %1$d songs)</string>
     <string name="k_custom_order">Custom order</string>
-    <string name="k_edit_order">Edit order</string>
-    <string name="k_edit_order_hint">Long press a song (or drag the handle) to move it.</string>
     <string name="k_reset_order">Reset custom order</string>
-    <string name="k_save">Save</string>
     <string name="k_backup_export">Back up</string>
     <string name="k_backup_export_summary">Save settings, custom song orders and playlists to a file</string>
     <string name="k_backup_import">Restore</string>

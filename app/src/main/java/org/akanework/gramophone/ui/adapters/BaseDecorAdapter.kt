@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.KCustomOrder
-import org.akanework.gramophone.ui.components.KOrderEditor
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.ui.QuickLinearSmoothScroller
@@ -123,11 +122,8 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
             val kKey = kSongAdapter?.let { it.kOrderKey!!.invoke(it.getSongList()) }
             if (kSongAdapter != null) {
                 popupMenu.menu.findItem(R.id.natural).setTitle(R.string.k_custom_order)
-                if (kKey != null) {
-                    popupMenu.menu.add(Menu.NONE, R.id.k_edit_order, 100, R.string.k_edit_order)
-                    if (KCustomOrder.has(context, kKey))
-                        popupMenu.menu.add(Menu.NONE, R.id.k_reset_order, 101, R.string.k_reset_order)
-                }
+                if (kKey != null && KCustomOrder.has(context, kKey))
+                    popupMenu.menu.add(Menu.NONE, R.id.k_reset_order, 101, R.string.k_reset_order)
             }
             if (adapter.sortType.value != Sorter.Type.None) {
                 when (adapter.sortType.value) {
@@ -178,17 +174,6 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
                                     "L" + getAdapterType(adapter).toString(),
                                     layoutMap[menuItem.itemId].toString()
                                 )
-                            }
-                        }
-                        true
-                    }
-
-                    R.id.k_edit_order -> {
-                        KOrderEditor.show(context, kKey!!, kSongAdapter!!.getSongList()) {
-                            adapter.sort(Sorter.Type.NaturalOrder)
-                            prefs.edit {
-                                putString("S" + getAdapterType(adapter).toString(),
-                                    Sorter.Type.NaturalOrder.toString())
                             }
                         }
                         true

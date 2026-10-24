@@ -56,8 +56,13 @@ class AlbumAdapter(
     isSubFragment = isSubFragment
 ) {
 
+    // Gramophone K: plain list without covers
+    override val canChangeLayout = false
+    override val kHideListCover = true
+
     init {
         lateInit()
+        layoutType = LayoutType.LIST
     }
 
     fun getAlbumList() = list?.second ?: emptyList()

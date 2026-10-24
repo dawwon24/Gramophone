@@ -59,8 +59,13 @@ class ArtistAdapter(
     defaultLayoutType = LayoutType.LIST
 ) {
 
+    // Gramophone K: plain list without covers
+    override val canChangeLayout = false
+    override val kHideListCover = true
+
     init {
         lateInit()
+        layoutType = LayoutType.LIST
     }
 
     override fun virtualTitleOf(item: Artist): String {

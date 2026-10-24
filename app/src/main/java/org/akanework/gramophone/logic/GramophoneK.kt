@@ -136,8 +136,8 @@ object GramophoneK {
         }
 
         // An explicit "play whole list from here" never asks.
-        if (forceList || !confirm || !controller.isPlaying || controller.mediaItemCount == 0 ||
-            queueIsSameList) {
+        // Ask whenever there is a queue to lose, also while paused.
+        if (forceList || !confirm || controller.mediaItemCount == 0 || queueIsSameList) {
             replace(single)
             return
         }

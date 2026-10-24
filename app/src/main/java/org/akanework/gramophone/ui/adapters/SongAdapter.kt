@@ -38,6 +38,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import org.akanework.gramophone.logic.KCustomOrder
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getFile
@@ -177,8 +180,63 @@ class SongAdapter(
         }
     }
 
+    // Gramophone K: in "custom order" mode songs can be dragged by their handle; the new order
+    // is saved when the song is dropped.
+    private var kMoved = false
+    private val kTouchHelper by lazy {
+        ItemTouchHelper(object : ItemTouchHelper.Callback() {
+            override fun isLongPressDragEnabled() = false
+            override fun isItemViewSwipeEnabled() = false
+
+            override fun getMovementFlags(
+                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
+            ): Int = if (kDragEnabled() && viewHolder.bindingAdapter === this@SongAdapter)
+                makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) else 0
+
+            override fun onMove(
+                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                if (target.bindingAdapter !== this@SongAdapter) return false
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+                val cur = list ?: return false
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                val newList = cur.second.toMutableList()
+                newList.add(to, newList.removeAt(from))
+                list = cur.first to newList
+                notifyItemMoved(from, to)
+                kMoved = true
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                if (!kMoved) return
+                kMoved = false
+                val songs = getSongList()
+                kOrderKey?.invoke(songs)?.let { KCustomOrder.save(context, it, songs) }
+            }
+        })
+    }
+
+    override fun kDragEnabled() = kOrderKey != null && sortType.value == Sorter.Type.NaturalOrder
+
+    override fun kStartDrag(holder: ViewHolder) {
+        if (kDragEnabled()) kTouchHelper.startDrag(holder)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    override fun sort(type: Sorter.Type) {
+        super.sort(type)
+        if (kOrderKey != null) notifyItemRangeChanged(0, itemCount) // show / hide handles
+    }
+
     override fun onAttachedToRecyclerView(recyclerView: MyRecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        if (kOrderKey != null) kTouchHelper.attachToRecyclerView(recyclerView)
         if (folder) {
             prefs.registerOnSharedPreferenceChangeListener(this)
             showFileNames = prefs.getBooleanStrict("show_file_names", false)
@@ -187,6 +245,7 @@ class SongAdapter(
 
     override fun onDetachedFromRecyclerView(recyclerView: MyRecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        if (kOrderKey != null) kTouchHelper.attachToRecyclerView(null)
         if (folder)
             prefs.unregisterOnSharedPreferenceChangeListener(this)
     }

@@ -60,6 +60,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.zhanghai.android.fastscroll.PopupTextProvider
+import android.view.MotionEvent
+import androidx.constraintlayout.widget.ConstraintLayout
+import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.getStringStrict
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
@@ -286,6 +289,7 @@ abstract class BaseAdapter<T : Any>(
     ) : RecyclerView.ViewHolder(view) {
         val songCover: ImageView = view.findViewById(R.id.cover)
         val coverCard: View? = view.findViewById(R.id.coverCardView)
+        var kDragHandle: ImageView? = null
         val nowPlaying: ImageView = view.findViewById(R.id.now_playing)
         val title: TextView = view.findViewById(R.id.title)
         val subTitle: TextView = view.findViewById(R.id.artist)
@@ -366,6 +370,19 @@ abstract class BaseAdapter<T : Any>(
         val hideCover = kHideListCover && layoutType != LayoutType.GRID &&
                 layoutType != LayoutType.COMPACT_GRID
         holder.coverCard?.visibility = if (hideCover) View.GONE else View.VISIBLE
+        // Gramophone K: drag handle for user defined order (view holders are shared, always set)
+        if (layoutType != LayoutType.GRID && layoutType != LayoutType.COMPACT_GRID) {
+            val handle = holder.kDragHandle ?: createDragHandle(holder)
+            if (handle != null) {
+                val drag = kDragEnabled()
+                handle.visibility = if (drag) View.VISIBLE else View.GONE
+                @SuppressLint("ClickableViewAccessibility")
+                handle.setOnTouchListener(if (!drag) null else { _, ev ->
+                    if (ev.actionMasked == MotionEvent.ACTION_DOWN) kStartDrag(holder)
+                    false
+                })
+            }
+        }
         if (!hideCover) holder.songCover.load(coverOf(item)) {
             placeholderScaleToFit(defaultCover)
             crossfade(true)
@@ -432,6 +449,7 @@ abstract class BaseAdapter<T : Any>(
     }
 
     override fun onViewRecycled(holder: ViewHolder) {
+        holder.kDragHandle?.setOnTouchListener(null)
         holder.itemView.setOnClickListener(null)
         holder.itemView.setOnLongClickListener(null)
         holder.moreButton?.setOnClickListener(null)
@@ -478,6 +496,33 @@ abstract class BaseAdapter<T : Any>(
 
     protected abstract fun virtualTitleOf(item: T): String
     protected open val kHideListCover = false
+    protected open fun kDragEnabled(): Boolean = false
+    protected open fun kStartDrag(holder: ViewHolder) {}
+
+    private fun createDragHandle(holder: ViewHolder): ImageView? {
+        val root = holder.itemView as? ConstraintLayout ?: return null
+        val card = holder.coverCard ?: return null
+        val handle = ImageView(root.context)
+        handle.id = R.id.k_drag_handle
+        val dp8 = 8.dpToPx(root.context)
+        handle.setPaddingRelative(14.dpToPx(root.context), dp8, 0, dp8)
+        handle.setImageResource(R.drawable.baseline_drag_handle_24)
+        handle.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        root.addView(handle, ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+        ).apply {
+            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+            topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        })
+        card.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            startToStart = ConstraintLayout.LayoutParams.UNSET
+            startToEnd = R.id.k_drag_handle
+        }
+        holder.kDragHandle = handle
+        return handle
+    }
     protected open fun getPinnedOrder(item: T): Int {
         return 0
     }

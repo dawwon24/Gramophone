@@ -11,7 +11,7 @@
     <string name="k_song_click_single">그 노래만 재생</string>
     <string name="k_song_click_list">목록 전체를 그 노래부터 재생</string>
     <string name="k_confirm_replace_queue">재생 목록 교체 전 확인</string>
-    <string name="k_confirm_replace_queue_summary">음악이 재생 중일 때 다른 목록의 노래를 누르면, 바로 바꾸지 않고 먼저 물어봅니다</string>
+    <string name="k_confirm_replace_queue_summary">재생 목록이 있을 때(일시정지 포함) 다른 노래를 누르면, 바로 바꾸지 않고 먼저 물어봅니다</string>
     <string name="k_album_min_songs">앨범 탭 기준</string>
     <string name="k_album_min_all">모든 앨범 표시</string>
     <string name="k_album_min_n">폴더 전체가 한 앨범인 경우만 (%1$d곡 이상)</string>
@@ -26,10 +26,7 @@
     <string name="k_replace_queue_only_this">이 곡만 재생 (지금 목록 %1$d곡 대체)</string>
     <string name="k_replace_queue_list_from_here">여기서부터 전체 재생 (지금 목록 %1$d곡 대체)</string>
     <string name="k_custom_order">사용자 지정 순서</string>
-    <string name="k_edit_order">순서 편집</string>
-    <string name="k_edit_order_hint">곡을 길게 누르거나 왼쪽 손잡이를 끌어서 옮기세요.</string>
     <string name="k_reset_order">사용자 지정 순서 초기화</string>
-    <string name="k_save">저장</string>
     <string name="k_backup_export">백업</string>
     <string name="k_backup_export_summary">설정, 사용자 지정 곡 순서, 재생 목록을 파일로 저장</string>
     <string name="k_backup_import">복원</string>
