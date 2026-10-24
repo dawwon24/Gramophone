@@ -18,6 +18,7 @@
 package org.akanework.gramophone.ui.adapters
 
 import android.content.Context
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,8 @@ import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.KCustomOrder
+import org.akanework.gramophone.ui.components.KOrderEditor
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.logic.ui.QuickLinearSmoothScroller
@@ -52,6 +55,9 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
     var jumpDownPos: (() -> Int)? = null
     var offsetPos: (() -> Int)? = null
 
+    // Gramophone K: hide this row completely (e.g. "0 folders" row in folder tabs)
+    var kHidden = false
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -61,6 +67,10 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.itemView.visibility = if (kHidden) View.GONE else View.VISIBLE
+        holder.itemView.layoutParams = holder.itemView.layoutParams.apply {
+            height = if (kHidden) 0 else dpHeight
+        }
         val count = adapter.itemCountForDecor
         holder.playAll.visibility =
             if (adapter is SongAdapter && adapter.isSubFragment != R.id.songs ||
@@ -108,6 +118,17 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
                 popupMenu.menu.findItem(it.key).isVisible = adapter.canChangeLayout
             }
             popupMenu.menu.findItem(R.id.display).isVisible = adapter.canChangeLayout
+            // Gramophone K: user defined order for folder / artist song lists
+            val kSongAdapter = (adapter as? SongAdapter)?.takeIf { it.kOrderKey != null }
+            val kKey = kSongAdapter?.let { it.kOrderKey!!.invoke(it.getSongList()) }
+            if (kSongAdapter != null) {
+                popupMenu.menu.findItem(R.id.natural).setTitle(R.string.k_custom_order)
+                if (kKey != null) {
+                    popupMenu.menu.add(Menu.NONE, R.id.k_edit_order, 100, R.string.k_edit_order)
+                    if (KCustomOrder.has(context, kKey))
+                        popupMenu.menu.add(Menu.NONE, R.id.k_reset_order, 101, R.string.k_reset_order)
+                }
+            }
             if (adapter.sortType.value != Sorter.Type.None) {
                 when (adapter.sortType.value) {
                     in buttonMap.values -> {
@@ -159,6 +180,22 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
                                 )
                             }
                         }
+                        true
+                    }
+
+                    R.id.k_edit_order -> {
+                        KOrderEditor.show(context, kKey!!, kSongAdapter!!.getSongList()) {
+                            adapter.sort(Sorter.Type.NaturalOrder)
+                            prefs.edit {
+                                putString("S" + getAdapterType(adapter).toString(),
+                                    Sorter.Type.NaturalOrder.toString())
+                            }
+                        }
+                        true
+                    }
+
+                    R.id.k_reset_order -> {
+                        KCustomOrder.reset(context, kKey!!)
                         true
                     }
 
@@ -235,14 +272,9 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
                 }
             }
         }
-        holder.jumpUp.visibility = if (jumpUpPos != null) View.VISIBLE else View.GONE
-        holder.jumpUp.setOnClickListener {
-            scrollToViewPosition(jumpUpPos!!())
-        }
-        holder.jumpDown.visibility = if (jumpDownPos != null) View.VISIBLE else View.GONE
-        holder.jumpDown.setOnClickListener {
-            scrollToViewPosition(jumpDownPos!!())
-        }
+        // Gramophone K: jump up/down buttons are hidden
+        holder.jumpUp.visibility = View.GONE
+        holder.jumpDown.visibility = View.GONE
     }
 
     fun goToPlayingSong() {
@@ -320,6 +352,6 @@ open class BaseDecorAdapter<T : AdapterFragment.BaseInterface<*>>(
     }
 
     override fun getItemHeightFromZeroTo(to: Int): Int {
-        return if (to > 0) dpHeight else 0
+        return if (to > 0 && !kHidden) dpHeight else 0
     }
 }

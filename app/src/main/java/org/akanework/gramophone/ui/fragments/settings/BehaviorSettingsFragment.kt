@@ -18,6 +18,14 @@
 package org.akanework.gramophone.ui.fragments.settings
 
 import android.content.Intent
+import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.akanework.gramophone.logic.KBackup
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -39,6 +47,35 @@ class BehaviorSettingsActivity : BaseSettingsActivity(
     { BehaviorSettingsFragment() })
 
 class BehaviorSettingsFragment : BasePreferenceFragment() {
+
+    // Gramophone K: backup / restore
+    private val exportLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) {
+            it?.let { uri -> runBackup(true, uri) }
+        }
+    private val importLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+            it?.let { uri -> runBackup(false, uri) }
+        }
+
+    private fun runBackup(export: Boolean, uri: Uri) {
+        val ctx = requireContext().applicationContext
+        lifecycleScope.launch {
+            val msg = try {
+                val r = withContext(Dispatchers.IO) {
+                    if (export) KBackup.export(ctx, uri) else KBackup.import(ctx, uri)
+                }
+                if (export) getString(R.string.k_backup_export_done, r.playlists)
+                else getString(R.string.k_backup_import_done, r.playlists, r.skippedPlaylists)
+            } catch (e: Exception) {
+                getString(R.string.k_backup_failed, e.javaClass.simpleName + ": " + e.message)
+            }
+            MaterialAlertDialogBuilder(requireContext())
+                .setMessage(msg)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -64,6 +101,12 @@ class BehaviorSettingsFragment : BasePreferenceFragment() {
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        if (preference.key == "k_backup_export") {
+            exportLauncher.launch("gramophone-k-backup.json")
+        }
+        if (preference.key == "k_backup_import") {
+            importLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }
         if (preference.key == "blacklist") {
             startActivity(BlacklistSettingsActivity::class.java)
         }

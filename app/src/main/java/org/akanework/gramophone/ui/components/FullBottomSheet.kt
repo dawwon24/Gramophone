@@ -491,6 +491,11 @@ class FullBottomSheet
             }
         }
 
+        // Gramophone K: add the current song to a playlist
+        findViewById<MaterialButton>(R.id.k_add_to_playlist).setOnClickListener {
+            ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
+            instance?.currentMediaItem?.let { item -> activity.addToPlaylistDialog(item) }
+        }
         // Gramophone K: the playback speed button is reused as "stop and clear queue"
         bottomSheetPlaybackSpeedButton.setIconResource(R.drawable.baseline_delete_sweep_24)
         bottomSheetPlaybackSpeedButton.contentDescription = context.getString(R.string.k_clear_queue)

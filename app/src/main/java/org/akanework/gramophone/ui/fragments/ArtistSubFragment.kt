@@ -31,11 +31,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
+import org.akanework.gramophone.logic.KCustomOrder
 import org.akanework.gramophone.logic.enableEdgeToEdgePaddingListener
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
 import org.akanework.gramophone.logic.ui.MyRecyclerView
-import org.akanework.gramophone.ui.adapters.AlbumAdapter
 import org.akanework.gramophone.ui.adapters.SongAdapter
+import org.akanework.gramophone.ui.adapters.Sorter
 
 /**
  * ArtistSubFragment:
@@ -51,7 +52,6 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
         private const val TAG = "ArtistSubFragment"
     }
 
-    private lateinit var albumAdapter: AlbumAdapter
     private lateinit var songAdapter: SongAdapter
     private var recyclerView: MyRecyclerView? = null
 
@@ -74,31 +74,25 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
                 it.albumArtistListFlow else it.artistListFlow
         }.map { it.find { it.id == id } }
         val title = item.map { it?.title ?: requireContext().getString(R.string.unknown_artist) }
-        albumAdapter = AlbumAdapter(
-            this, title, item.map { it?.albumList },
-            isSubFragment = itemType
-        )
-        albumAdapter.decorAdapter.jumpDownPos = { albumAdapter.concatAdapter.itemCount }
+        // Gramophone K: songs only (no album section), with user defined order
         songAdapter = SongAdapter(
             this,
             title,
             item.map { it?.songList },
-            isSubFragment = itemType
-        )
-        songAdapter.decorAdapter.jumpUpPos = { 0 }
-        songAdapter.decorAdapter.offsetPos = { albumAdapter.concatAdapter.itemCount }
-        val ih = DefaultItemHeightHelper.concatItemHeightHelper(
-            albumAdapter.itemHeightHelper,
-            { albumAdapter.concatAdapter.itemCount }, songAdapter.itemHeightHelper
+            isSubFragment = itemType,
+            rawOrderExposed = Sorter.Type.NaturalOrder,
+            kOrderKey = { songs ->
+                KCustomOrder.artistKey(
+                    if (itemType == R.id.album_artist) songs.firstNotNullOfOrNull {
+                        it.mediaMetadata.albumArtist?.toString() } ?: songs.firstOrNull()
+                        ?.mediaMetadata?.artist?.toString()
+                    else songs.firstOrNull()?.mediaMetadata?.artist?.toString())
+            }
         )
         recyclerView!!.enableEdgeToEdgePaddingListener()
-        recyclerView!!.adapter =
-            ConcatAdapter(
-                ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(),
-                albumAdapter.concatAdapter, songAdapter.concatAdapter
-            )
+        recyclerView!!.adapter = songAdapter.concatAdapter
         recyclerView!!.setAppBar(appBarLayout)
-        recyclerView!!.fastScroll(this, ih)
+        recyclerView!!.fastScroll(this, songAdapter.itemHeightHelper)
 
         topAppBar.setNavigationOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
@@ -116,10 +110,6 @@ class ArtistSubFragment : BaseFragment(true), PopupTextProvider {
     }
 
     override fun getPopupText(view: View, position: Int): CharSequence {
-        return if (position < albumAdapter.concatAdapter.itemCount) {
-            albumAdapter.getPopupText(view, position)
-        } else {
-            songAdapter.getPopupText(view, position - albumAdapter.concatAdapter.itemCount)
-        }
+        return songAdapter.getPopupText(view, position)
     }
 }

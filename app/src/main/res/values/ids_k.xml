@@ -2,4 +2,6 @@
 <!-- Gramophone K custom ids -->
 <resources>
     <item name="k_play_list_from_here" type="id" />
+    <item name="k_edit_order" type="id" />
+    <item name="k_reset_order" type="id" />
 </resources>

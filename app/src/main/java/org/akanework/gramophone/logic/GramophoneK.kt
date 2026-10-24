@@ -122,8 +122,8 @@ object GramophoneK {
         val queueIsSameList = !single && controller.mediaItemCount == songList.size &&
                 songList.indices.all { controller.getMediaItemAt(it).mediaId == songList[it].mediaId }
 
-        val replace = {
-            if (single) {
+        fun replace(onlyThisSong: Boolean) {
+            if (onlyThisSong) {
                 controller.setMediaItemsWithTitle(listOf(clicked), 0, title)
             } else {
                 controller.setMediaItemsSeamlessly(songList, position, title)
@@ -135,26 +135,30 @@ object GramophoneK {
             }
         }
 
-        if (!confirm || !controller.isPlaying || controller.mediaItemCount == 0 || queueIsSameList) {
-            replace()
+        // An explicit "play whole list from here" never asks.
+        if (forceList || !confirm || !controller.isPlaying || controller.mediaItemCount == 0 ||
+            queueIsSameList) {
+            replace(single)
             return
         }
 
         val songTitle = clicked.mediaMetadata.title ?: ""
+        val count = controller.mediaItemCount
         MaterialAlertDialogBuilder(activity)
             .setTitle(activity.getString(R.string.k_replace_queue_title, songTitle))
             .setItems(
                 arrayOf(
-                    activity.getString(R.string.k_replace_queue_play_now,
-                        controller.mediaItemCount),
+                    activity.getString(R.string.k_replace_queue_only_this, count),
+                    activity.getString(R.string.k_replace_queue_list_from_here, count),
                     activity.getString(R.string.play_next),
                     activity.getString(R.string.add_to_queue)
                 )
             ) { _, which ->
                 when (which) {
-                    0 -> replace()
-                    1 -> controller.addMediaItem(controller.currentMediaItemIndex + 1, clicked)
-                    2 -> controller.addMediaItem(clicked)
+                    0 -> replace(true)
+                    1 -> replace(false)
+                    2 -> controller.addMediaItem(controller.currentMediaItemIndex + 1, clicked)
+                    3 -> controller.addMediaItem(clicked)
                 }
             }
             .setNegativeButton(android.R.string.cancel, null)

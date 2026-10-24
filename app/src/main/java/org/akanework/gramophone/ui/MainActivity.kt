@@ -105,6 +105,9 @@ import uk.akane.libphonograph.manipulator.PlaylistSerializer
 import uk.akane.libphonograph.manipulator.PlaylistSerializer.Entry
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 /**
  * MainActivity:
@@ -221,6 +224,16 @@ class MainActivity : BaseActivity() {
 
         // Set content Views.
         setContentView(R.layout.activity_main)
+        // Gramophone K: size the navigation bar scrim to the navigation bar
+        findViewById<View>(R.id.k_nav_scrim).let { scrim ->
+            ViewCompat.setOnApplyWindowInsetsListener(scrim) { v, insets ->
+                val h = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+                if (v.layoutParams.height != h) {
+                    v.layoutParams = v.layoutParams.apply { height = h }
+                }
+                insets
+            }
+        }
         if (BuildConfig.DEBUG) {
             @SuppressLint("SetTextI18n")
             findViewById<ViewGroup>(R.id.rootView).addView(TextView(this).apply {

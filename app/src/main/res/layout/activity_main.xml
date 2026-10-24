@@ -15,6 +15,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Gramophone K: opaque strip behind the navigation bar so lists don't scroll behind it.
+         Drawn below the player sheet, so the sheet still covers it when shown. -->
+    <View
+        android:id="@+id/k_nav_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:background="?android:attr/colorBackground"
+        android:clickable="true"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
+
     <org.akanework.gramophone.ui.components.PlayerBottomSheet
         android:id="@+id/player_layout"
         android:layout_width="match_parent"

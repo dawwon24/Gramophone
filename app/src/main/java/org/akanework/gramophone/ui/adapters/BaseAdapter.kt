@@ -285,6 +285,7 @@ abstract class BaseAdapter<T : Any>(
         view: View,
     ) : RecyclerView.ViewHolder(view) {
         val songCover: ImageView = view.findViewById(R.id.cover)
+        val coverCard: View? = view.findViewById(R.id.coverCardView)
         val nowPlaying: ImageView = view.findViewById(R.id.now_playing)
         val title: TextView = view.findViewById(R.id.title)
         val subTitle: TextView = view.findViewById(R.id.artist)
@@ -361,7 +362,11 @@ abstract class BaseAdapter<T : Any>(
         }
         holder.title.text = titleOf(item) ?: virtualTitleOf(item)
         holder.subTitle.text = subTitleOf(item)
-        holder.songCover.load(coverOf(item)) {
+        // Gramophone K: no covers in song lists (view holders are shared, so always set it)
+        val hideCover = kHideListCover && layoutType != LayoutType.GRID &&
+                layoutType != LayoutType.COMPACT_GRID
+        holder.coverCard?.visibility = if (hideCover) View.GONE else View.VISIBLE
+        if (!hideCover) holder.songCover.load(coverOf(item)) {
             placeholderScaleToFit(defaultCover)
             crossfade(true)
             error(defaultCover)
@@ -472,6 +477,7 @@ abstract class BaseAdapter<T : Any>(
     }
 
     protected abstract fun virtualTitleOf(item: T): String
+    protected open val kHideListCover = false
     protected open fun getPinnedOrder(item: T): Int {
         return 0
     }

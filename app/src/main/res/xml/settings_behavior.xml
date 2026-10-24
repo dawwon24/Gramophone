@@ -51,6 +51,20 @@
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
 
+        <Preference
+            android:key="k_backup_export"
+            android:layout="@layout/preference_basic"
+            android:summary="@string/k_backup_export_summary"
+            android:title="@string/k_backup_export"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="k_backup_import"
+            android:layout="@layout/preference_basic"
+            android:summary="@string/k_backup_import_summary"
+            android:title="@string/k_backup_import"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

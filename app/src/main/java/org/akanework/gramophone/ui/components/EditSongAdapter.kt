@@ -67,11 +67,8 @@ abstract class EditSongAdapter(
             item.mediaMetadata.durationMs?.convertDurationToTimeStamp(),
             item.mediaMetadata.artist ?: context.getString(R.string.unknown_artist)
         ) else item.mediaMetadata.artist ?: context.getString(R.string.unknown_artist)
-        holder.songCover.load(item.mediaMetadata.artworkUri) {
-            placeholderScaleToFit(getCoverFallback(position))
-            crossfade(true)
-            error(getCoverFallback(position))
-        }
+        // Gramophone K: no covers in song lists
+        holder.itemView.findViewById<View>(R.id.coverCardView).visibility = View.GONE
         holder.closeButton.setOnClickListener { v ->
             ViewCompat.performHapticFeedback(v, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             val pos = holder.bindingAdapterPosition

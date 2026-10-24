@@ -5,7 +5,6 @@
     <string name="k_tab_artists">가수</string>
 
     <string name="k_replace_queue_title">\"%1$s\" 재생</string>
-    <string name="k_replace_queue_play_now">지금 재생 (현재 재생 목록 %1$d곡은 사라짐)</string>
 
     <string name="k_settings_category">Gramophone K</string>
     <string name="k_song_click_mode">노래를 눌렀을 때</string>
@@ -20,7 +19,22 @@
     <string name="k_clear_queue">재생 중지 및 목록 비우기</string>
     <string name="k_clear_queue_message">재생을 멈추고 재생 목록의 %1$d곡을 모두 지울까요?</string>
     <string name="k_clear_queue_confirm">비우기</string>
-    <string name="k_play_list_from_here">여기부터 목록 전체 재생</string>
+    <string name="k_play_list_from_here">여기서부터 전체 재생</string>
     <string name="k_sort_song_count">곡 수</string>
     <string name="k_sort_album_count">앨범 수</string>
+
+    <string name="k_replace_queue_only_this">이 곡만 재생 (지금 목록 %1$d곡 대체)</string>
+    <string name="k_replace_queue_list_from_here">여기서부터 전체 재생 (지금 목록 %1$d곡 대체)</string>
+    <string name="k_custom_order">사용자 지정 순서</string>
+    <string name="k_edit_order">순서 편집</string>
+    <string name="k_edit_order_hint">곡을 길게 누르거나 왼쪽 손잡이를 끌어서 옮기세요.</string>
+    <string name="k_reset_order">사용자 지정 순서 초기화</string>
+    <string name="k_save">저장</string>
+    <string name="k_backup_export">백업</string>
+    <string name="k_backup_export_summary">설정, 사용자 지정 곡 순서, 재생 목록을 파일로 저장</string>
+    <string name="k_backup_import">복원</string>
+    <string name="k_backup_import_summary">백업 파일에서 복원 (이미 있는 재생 목록은 그대로 둠). 복원 후 앱을 다시 시작하세요.</string>
+    <string name="k_backup_export_done">백업했습니다 (재생 목록 %1$d개).</string>
+    <string name="k_backup_import_done">복원했습니다. 재생 목록 %1$d개 생성, %2$d개는 이미 있어서 건너뜀. 앱을 다시 시작하세요.</string>
+    <string name="k_backup_failed">실패: %1$s</string>
 </resources>

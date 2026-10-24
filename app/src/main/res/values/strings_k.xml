@@ -5,7 +5,6 @@
     <string name="k_tab_artists">Artists</string>
 
     <string name="k_replace_queue_title">Play \"%1$s\"?</string>
-    <string name="k_replace_queue_play_now">Play now (replaces current queue of %1$d songs)</string>
 
     <string name="k_settings_category">Gramophone K</string>
     <string name="k_song_click_mode">When tapping a song</string>
@@ -20,9 +19,24 @@
     <string name="k_clear_queue">Stop and clear queue</string>
     <string name="k_clear_queue_message">Stop playback and remove all %1$d songs from the queue?</string>
     <string name="k_clear_queue_confirm">Clear</string>
-    <string name="k_play_list_from_here">Play whole list from here</string>
+    <string name="k_play_list_from_here">Play all from here</string>
     <string name="k_sort_song_count">Song count</string>
     <string name="k_sort_album_count">Album count</string>
+
+    <string name="k_replace_queue_only_this">Play only this song (replaces current %1$d songs)</string>
+    <string name="k_replace_queue_list_from_here">Play all from here (replaces current %1$d songs)</string>
+    <string name="k_custom_order">Custom order</string>
+    <string name="k_edit_order">Edit order</string>
+    <string name="k_edit_order_hint">Long press a song (or drag the handle) to move it.</string>
+    <string name="k_reset_order">Reset custom order</string>
+    <string name="k_save">Save</string>
+    <string name="k_backup_export">Back up</string>
+    <string name="k_backup_export_summary">Save settings, custom song orders and playlists to a file</string>
+    <string name="k_backup_import">Restore</string>
+    <string name="k_backup_import_summary">Restore from a backup file (existing playlists are kept). Restart the app afterwards.</string>
+    <string name="k_backup_export_done">Backup saved (%1$d playlists).</string>
+    <string name="k_backup_import_done">Restored. %1$d playlists created, %2$d skipped (already exist). Please restart the app.</string>
+    <string name="k_backup_failed">Failed: %1$s</string>
 
     <string-array name="k_song_click_mode_entries" translatable="false">
         <item>@string/k_song_click_single</item>

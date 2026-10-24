@@ -48,6 +48,7 @@ import me.zhanghai.android.fastscroll.PopupTextProvider
 import org.akanework.gramophone.R
 import org.akanework.gramophone.logic.comparators.SupportComparator
 import org.akanework.gramophone.logic.emitOrDie
+import org.akanework.gramophone.logic.KCustomOrder
 import org.akanework.gramophone.logic.getStringStrict
 import org.akanework.gramophone.logic.ui.DefaultItemHeightHelper
 import org.akanework.gramophone.logic.ui.ItemHeightHelper
@@ -160,8 +161,11 @@ class DetailedFolderAdapter(
     private val folderAdapter: FolderListAdapter = FolderListAdapter(mainActivity, this)
     private val decorAdapter =
         BaseDecorAdapter<DetailedFolderAdapter>(this, R.plurals.folders_plural)
+            .apply { kHidden = true } // Gramophone K: no "N folders" row
     private val songAdapter: SongAdapter =
-        SongAdapter(fragment, qTitle, dataFlow.map { it.songList }, folder = true).apply {
+        SongAdapter(fragment, qTitle, dataFlow.map { it.songList }, folder = true,
+            rawOrderExposed = Sorter.Type.NaturalOrder,
+            kOrderKey = { KCustomOrder.folderKey(it) }).apply {
             onFullyDrawnListener = { reportFullyDrawn() }
             decorAdapter.jumpUpPos = { 0 }
             decorAdapter.offsetPos = { this@DetailedFolderAdapter.decorAdapter.itemCount +
@@ -224,6 +228,7 @@ class DetailedFolderAdapter(
             fileNodePath.collect {
                 withContext(Dispatchers.Main) {
                     folderPopAdapter.enabled = !it.isNullOrEmpty()
+                    if (folderPopAdapter.enabled) folderPopAdapter.notifyItemChanged(0)
                     onCanGoUpChanged?.invoke()
                 }
             }
@@ -420,8 +425,15 @@ class DetailedFolderAdapter(
     private class FolderPopAdapter(private val frag: DetailedFolderAdapter) :
         FolderCardAdapter(frag) {
 
+        // Gramophone K: header with back arrow and current folder name instead of "upper folder"
+        override fun getItemViewType(position: Int): Int = R.layout.k_folder_header
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+            ViewHolder(frag.fragment.layoutInflater.inflate(R.layout.k_folder_header, parent, false))
+
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.folderName.text = frag.mainActivity.getString(R.string.upper_folder)
+            holder.folderName.text = frag.fileNodePath.replayCache.firstOrNull()?.lastOrNull()
+                ?: frag.mainActivity.getString(R.string.upper_folder)
             holder.folderSubtitle.text = ""
             holder.itemView.setOnClickListener {
                 folderFragment.enter(null)

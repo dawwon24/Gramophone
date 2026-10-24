@@ -44,6 +44,7 @@ import org.akanework.gramophone.logic.getFile
 import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.logic.GramophoneK
+import org.akanework.gramophone.logic.KCustomOrder.withCustomOrder
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.MediaControllerViewModel
 import org.akanework.gramophone.ui.SongPickerActivity
@@ -73,16 +74,20 @@ class SongAdapter(
     allowDiffUtils: Boolean = false,
     rawOrderExposed: Sorter.Type? = if (isSubFragment == null) Sorter.Type.ByTitleAscending else null,
     val folder: Boolean = false,
-    fallbackContext: AppCompatActivity? = null
+    fallbackContext: AppCompatActivity? = null,
+    // Gramophone K: key for a user defined order of this list (folder / artist), see KCustomOrder
+    val kOrderKey: ((List<MediaItem>) -> String?)? = null
 ) : BaseAdapter<MediaItem>
     (
     fragment,
-    liveData = songList,
+    liveData = if (kOrderKey != null) songList.withCustomOrder(
+        (fragment?.requireContext() ?: fallbackContext!!), kOrderKey) else songList,
     sortHelper = MediaItemHelper,
     naturalOrderHelper = helper,
     initialSortType =
         (if (helper != null) Sorter.Type.NaturalOrder else (if (folder) Sorter.Type
-            .ByFilePathAscending else rawOrderExposed ?: Sorter.Type.ByTitleAscending)),
+            .ByFilePathAscending else rawOrderExposed?.takeIf { it != Sorter.Type.NaturalOrder }
+            ?: Sorter.Type.ByTitleAscending)),
     canSort = true,
     pluralStr = R.plurals.songs,
     defaultLayoutType = LayoutType.COMPACT_LIST,
@@ -100,6 +105,8 @@ class SongAdapter(
     fun getSongList() = list?.second ?: emptyList()
 
     fun getActivity() = mainActivity
+
+    override val kHideListCover = true
 
     private var showFileNames = false
     private var idToPosMap: HashMap<String, List<Int?>>? = null
