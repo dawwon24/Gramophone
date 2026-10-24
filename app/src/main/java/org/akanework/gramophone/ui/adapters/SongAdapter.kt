@@ -49,6 +49,9 @@ import org.akanework.gramophone.logic.gramophoneApplication
 import org.akanework.gramophone.logic.requireMediaStoreId
 import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.KCustomOrder.withCustomOrder
+import org.akanework.gramophone.logic.KSelection
+import com.google.android.material.color.MaterialColors
+import android.graphics.drawable.ColorDrawable
 import org.akanework.gramophone.logic.ui.MyRecyclerView
 import org.akanework.gramophone.ui.MediaControllerViewModel
 import org.akanework.gramophone.ui.SongPickerActivity
@@ -111,6 +114,34 @@ class SongAdapter(
     fun getSongList() = list?.second ?: emptyList()
 
     fun getActivity() = mainActivity
+
+    // Gramophone K: multi selection (see KSelection)
+    private val kLifecycleOwner = fragment?.viewLifecycleOwner
+    private val kCanSelect = fragment != null && isSubFragment != R.id.songs
+
+    fun kQueueTitle() = runBlocking { queueTitle!!.first() }
+
+    fun kNotifySelectionChanged() = notifyItemRangeChanged(0, itemCount, KSelection.PAYLOAD)
+
+    private fun kIsList() = layoutType != LayoutType.GRID && layoutType != LayoutType.COMPACT_GRID
+
+    private fun kBindSelection(holder: ViewHolder, position: Int) {
+        if (!kCanSelect || !kIsList()) return
+        val active = KSelection.isActive(this)
+        val item = getSongList().getOrNull(position)
+        holder.itemView.background = if (item != null && KSelection.isSelected(this, item))
+            ColorDrawable(MaterialColors.getColor(holder.itemView,
+                com.google.android.material.R.attr.colorSecondaryContainer)) else null
+        holder.moreButton?.visibility = if (active) View.INVISIBLE else View.VISIBLE
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        if (kCanSelect && kIsList()) {
+            holder.itemView.background = null
+            holder.moreButton?.visibility = View.VISIBLE
+        }
+        super.onViewRecycled(holder)
+    }
 
     override val kHideListCover = true
 
@@ -248,6 +279,7 @@ class SongAdapter(
 
     override fun onDetachedFromRecyclerView(recyclerView: MyRecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
+        if (KSelection.isActive(this)) KSelection.end()
         if (kOrderKey != null) kTouchHelper.attachToRecyclerView(null)
         if (folder)
             prefs.unregisterOnSharedPreferenceChangeListener(this)
@@ -286,6 +318,10 @@ class SongAdapter(
     override fun onClick(item: MediaItem, position: Int) {
         if (isSubFragment == R.id.songs) {
             (context as SongPickerActivity).onSelected(item)
+            return
+        }
+        if (KSelection.isActive(this)) {
+            KSelection.toggle(item)
             return
         }
         val title = runBlocking { queueTitle!!.first() }
@@ -414,6 +450,11 @@ class SongAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        // Gramophone K: selection highlight
+        if (payloads.isNotEmpty() && payloads.any { it === KSelection.PAYLOAD }) {
+            kBindSelection(holder, position)
+            if (payloads.all { it === KSelection.PAYLOAD }) return
+        }
         if (payloads.isNotEmpty()) {
             if (payloads.none { it is Boolean && it }) {
                 holder.nowPlaying.drawable?.level = if (currentIsPlaying == true) 1 else 0
@@ -429,6 +470,15 @@ class SongAdapter(
             }
         } else {
             super.onBindViewHolder(holder, position, payloads)
+            kBindSelection(holder, position)
+            if (kCanSelect && kIsList()) {
+                holder.itemView.setOnLongClickListener {
+                    val pos = holder.bindingAdapterPosition
+                    val song = getSongList().getOrNull(pos)
+                    if (song != null) KSelection.start(this, kLifecycleOwner!!, song)
+                    song != null
+                }
+            }
             if (currentMediaItem == null || getSongList()[position].mediaId != currentMediaItem)
                 return
         }

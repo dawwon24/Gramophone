@@ -40,4 +40,9 @@
     <plurals name="k_folders">
         <item quantity="other">%d개 폴더</item>
     </plurals>
+    <string name="k_selection_close">선택 종료</string>
+    <string name="k_selection_all">모두 선택</string>
+    <plurals name="k_selection_count">
+        <item quantity="other">%d곡 선택됨</item>
+    </plurals>
 </resources>

@@ -274,9 +274,12 @@ class MainActivity : BaseActivity() {
     }
 
     @OptIn(FlowPreview::class, InternalCoroutinesApi::class)
-    fun addToPlaylistDialog(item: MediaItem) {
-        val song = Entry.ofMediaItem(item)
-        if (song == null) {
+    fun addToPlaylistDialog(item: MediaItem) = addToPlaylistDialog(listOf(item))
+
+    // Gramophone K: several songs at once (multi selection in song lists)
+    fun addToPlaylistDialog(items: List<MediaItem>) {
+        val songs = items.map { Entry.ofMediaItem(it) }
+        if (songs.isEmpty() || songs.any { it == null }) {
             Toast.makeText(
                 this@MainActivity,
                 getString(R.string.edit_playlist_failed, "song == null"),
@@ -327,7 +330,7 @@ class MainActivity : BaseActivity() {
                             PlaylistAdapter.playlistNameDialog(this@MainActivity,
                                 R.string.create_playlist, "",
                                 { ItemManipulator.getDefaultPlaylistFile(it) }) { name ->
-                                addToPlaylist(null, name, listOf(song))
+                                addToPlaylist(null, name, songs.filterNotNull())
                             }
                             return@setItems
                         }
@@ -336,7 +339,7 @@ class MainActivity : BaseActivity() {
                             ContentUris.withAppendedId(
                                 @Suppress("deprecation") MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                                 pl.id!!
-                            ), null, listOf(song)
+                            ), null, songs.filterNotNull()
                         )
                     }
                     .setNegativeButton(android.R.string.cancel) { _, _ -> }

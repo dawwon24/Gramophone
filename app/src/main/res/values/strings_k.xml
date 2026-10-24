@@ -57,4 +57,10 @@
         <item quantity="one">%d folder</item>
         <item quantity="other">%d folders</item>
     </plurals>
+    <string name="k_selection_close">End selection</string>
+    <string name="k_selection_all">Select all</string>
+    <plurals name="k_selection_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
 </resources>
