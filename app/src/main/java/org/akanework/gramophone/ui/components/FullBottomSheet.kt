@@ -503,7 +503,7 @@ class FullBottomSheet
         bottomSheetPlaybackSpeedButton.setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             val instance = instance ?: return@setOnClickListener
-            MaterialAlertDialogBuilder(wrappedContext ?: context)
+            val builder = MaterialAlertDialogBuilder(wrappedContext ?: context)
                 .setTitle(R.string.k_clear_queue)
                 .setMessage(context.getString(R.string.k_clear_queue_message, instance.mediaItemCount))
                 .setPositiveButton(R.string.k_clear_queue_confirm) { _, _ ->
@@ -512,7 +512,15 @@ class FullBottomSheet
                     instance.clearMediaItems()
                 }
                 .setNegativeButton(android.R.string.cancel, null)
-                .show()
+            // Keep playing the current song, drop the rest: playback stops after it
+            if (instance.mediaItemCount > 1 && instance.currentMediaItemIndex != C.INDEX_UNSET) {
+                builder.setNeutralButton(R.string.k_keep_current_only) { _, _ ->
+                    val index = instance.currentMediaItemIndex
+                    instance.removeMediaItems(index + 1, instance.mediaItemCount)
+                    instance.removeMediaItems(0, index)
+                }
+            }
+            builder.show()
         }
 
         bottomSheetFavoriteButton.addOnCheckedChangeListener(this)
