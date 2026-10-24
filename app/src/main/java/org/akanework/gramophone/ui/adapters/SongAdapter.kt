@@ -294,8 +294,7 @@ class SongAdapter(
         popupMenu.inflate(R.menu.more_menu)
         // Gramophone K: tapping plays one song (by default), this plays the whole list
         if (isSubFragment != R.id.songs) {
-            popupMenu.menu.add(Menu.NONE, R.id.k_play_list_from_here, 0,
-                R.string.k_play_list_from_here)
+            popupMenu.menu.findItem(R.id.k_play_list_from_here).isVisible = true
         }
 
         popupMenu.setOnMenuItemClickListener { it1 ->
