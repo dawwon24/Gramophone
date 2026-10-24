@@ -95,7 +95,8 @@ class GramophoneApplication : Application(), SingletonImageLoader.Factory,
         onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val shouldUseEnhancedCoverReadingFlow = if (hasScopedStorageWithMediaTypes()) null else
         MutableSharedFlow<Boolean?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    val recentlyAddedFilterSecondFlow = MutableStateFlow(1_209_600L)
+    // Gramophone K: no "recently added" playlist (null = not generated)
+    val recentlyAddedFilterSecondFlow = MutableStateFlow<Long?>(null)
     val extraDisallowedFolders = setOf(
         Environment.DIRECTORY_RINGTONES,
         Environment.DIRECTORY_NOTIFICATIONS,
