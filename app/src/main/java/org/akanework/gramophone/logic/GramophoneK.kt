@@ -44,7 +44,8 @@ object GramophoneK {
      */
     fun Flow<List<Album>?>.filterAlbumsForTab(context: Context): Flow<List<Album>?> {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-        fun minSongs() = prefs.getStringStrict(PREF_ALBUM_MIN_SONGS, "2")?.toIntOrNull() ?: 2
+        // not getStringStrict(): this runs on a background thread
+        fun minSongs() = prefs.getString(PREF_ALBUM_MIN_SONGS, "2")?.toIntOrNull() ?: 2
         val minSongsFlow = callbackFlow {
             val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 if (key == PREF_ALBUM_MIN_SONGS) trySend(minSongs())
