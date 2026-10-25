@@ -19,7 +19,9 @@ package org.akanework.gramophone.logic
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
@@ -172,6 +174,35 @@ object GramophoneK {
             .show()
     }
 
+
+    /**
+     * Shuffles the songs after the current one, once (like Spotify / YouTube Music "shuffle" on
+     * the queue): already played songs and the current song keep their place. If shuffle mode is
+     * on, its play order is written out first and the mode is turned off, so the queue afterwards
+     * is a plain list in the order it will be played.
+     */
+    fun shuffleUpcoming(player: Player): Boolean {
+        val count = player.mediaItemCount
+        val current = player.currentMediaItemIndex
+        if (count < 3 || current == C.INDEX_UNSET) return false
+        val shuffle = player.shuffleModeEnabled
+        val order = ArrayList<Int>(count)
+        val timeline = player.currentTimeline
+        var i = timeline.getFirstWindowIndex(shuffle)
+        while (i != C.INDEX_UNSET) {
+            order.add(i)
+            i = timeline.getNextWindowIndex(i, Player.REPEAT_MODE_OFF, shuffle)
+        }
+        val pos = order.indexOf(current)
+        if (order.size != count || pos == -1 || pos >= count - 2) return false
+        val before = order.subList(0, pos).map { player.getMediaItemAt(it) }
+        val after = order.subList(pos + 1, count).map { player.getMediaItemAt(it) }.shuffled()
+        if (shuffle) player.shuffleModeEnabled = false
+        // the current song is never touched, so playback goes on without a gap
+        player.replaceMediaItems(current + 1, count, after)
+        if (shuffle) player.replaceMediaItems(0, current, before)
+        return true
+    }
     /**
      * Playlist entries without duplicates (same file), keeping the first occurrence. Used when
      * adding songs to a playlist, so adding a song twice doesn't list it twice.

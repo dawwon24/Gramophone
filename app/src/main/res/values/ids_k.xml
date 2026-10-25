@@ -5,4 +5,5 @@
     <item name="k_drag_handle" type="id" />
     <item name="k_reset_order" type="id" />
     <item name="k_edit_tags" type="id" />
+    <item name="k_remove_from_playlist" type="id" />
 </resources>

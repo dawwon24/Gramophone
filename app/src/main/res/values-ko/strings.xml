@@ -22,7 +22,7 @@
     <string name="dismiss">닫기</string>
     <string name="refreshed_songs">%1$d개 곡 새로고침</string>
     <string name="settings_contributors">기여자</string>
-    <string name="play_next">다음 곡 재생</string>
+    <string name="play_next">다음 곡으로 추가</string>
     <string name="go_to_album">앨범으로 이동</string>
     <string name="details">세부 정보</string>
     <string name="shuffle">무작위 재생</string>
@@ -384,7 +384,7 @@
     <string name="contributors_lambada10">가사 샘플 제공 및 SoncSync 개발</string>
     <string name="contributors_code_contributions">코드 기여</string>
     <string name="contributors_ghhccghk">상태 표시 줄 가사 및 기타 개선</string>
-    <string name="add_to_queue">대기열에 추가</string>
+    <string name="add_to_queue">맨 뒤에 추가</string>
     <string name="home_menu_quick_refresh">빠른 새로고침</string>
     <string name="disabled">꺼짐</string>
     <string name="offload_enabled_if_supported">항상 켜짐</string>

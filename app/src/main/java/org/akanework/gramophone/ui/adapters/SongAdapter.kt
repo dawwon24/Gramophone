@@ -84,7 +84,9 @@ class SongAdapter(
     fallbackContext: AppCompatActivity? = null,
     // Gramophone K: key for a user defined order of this list (folder / artist), see KCustomOrder
     val kOrderKey: ((List<MediaItem>) -> String?)? = null,
-    kQuery: MutableStateFlow<String> = MutableStateFlow("")
+    kQuery: MutableStateFlow<String> = MutableStateFlow(""),
+    // Gramophone K: set for playlists, adds "remove from playlist" to the song menu
+    val kRemoveFromPlaylist: ((MediaItem) -> Unit)? = null
 ) : BaseAdapter<MediaItem>
     (
     fragment,
@@ -340,6 +342,7 @@ class SongAdapter(
             popupMenu.menu.findItem(R.id.k_play_list_from_here).isVisible = true
         }
         popupMenu.menu.findItem(R.id.share).isVisible = false
+        popupMenu.menu.findItem(R.id.k_remove_from_playlist).isVisible = kRemoveFromPlaylist != null
 
         popupMenu.setOnMenuItemClickListener { it1 ->
             when (it1.itemId) {
@@ -368,6 +371,11 @@ class SongAdapter(
                     mediaController?.addMediaItem(
                         item,
                     )
+                    true
+                }
+
+                R.id.k_remove_from_playlist -> {
+                    kRemoveFromPlaylist?.invoke(item)
                     true
                 }
 

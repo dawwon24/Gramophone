@@ -11,6 +11,11 @@
         android:id="@id/k_play_list_from_here"
         android:title="@string/k_play_list_from_here"
         android:visible="false" />
+    <!-- Gramophone K: only shown in playlists -->
+    <item
+        android:id="@id/k_remove_from_playlist"
+        android:title="@string/k_remove_from_playlist"
+        android:visible="false" />
     <item
         android:id="@+id/album"
         android:title="@string/go_to_album" />

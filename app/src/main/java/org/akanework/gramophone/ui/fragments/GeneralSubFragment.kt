@@ -17,7 +17,9 @@
 
 package org.akanework.gramophone.ui.fragments
 
+import android.content.ContentUris
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +46,7 @@ import org.akanework.gramophone.ui.adapters.Sorter
 import uk.akane.libphonograph.dynamicitem.Favorite
 import uk.akane.libphonograph.dynamicitem.RecentlyAdded
 import uk.akane.libphonograph.items.Playlist
+import uk.akane.libphonograph.manipulator.PlaylistSerializer.Entry
 
 /**
  * GeneralSubFragment:
@@ -80,6 +83,8 @@ class GeneralSubFragment : BaseFragment(true) {
 
         val title: Flow<String>
         var rawOrderExposed: Sorter.Type? = null
+        // Gramophone K: "remove from playlist" in the song menu of playlists
+        var kRemoveFromPlaylist: ((MediaItem) -> Unit)? = null
 
         when (itemType) {
             R.id.album -> {
@@ -140,6 +145,23 @@ class GeneralSubFragment : BaseFragment(true) {
                 }
                 itemList = item.map { it?.songList }
                 rawOrderExposed = Sorter.Type.NaturalOrder
+                if (clazz == Favorite::class.java.name) {
+                    kRemoveFromPlaylist = { song ->
+                        Entry.ofMediaItem(song)?.let {
+                            mainActivity.markIsFavoriteStatus(listOf(it), false)
+                        }
+                    }
+                }
+                if (clazz == Playlist::class.java.name && id != null) {
+                    kRemoveFromPlaylist = { song ->
+                        Entry.ofMediaItem(song)?.let {
+                            mainActivity.addToPlaylist(ContentUris.withAppendedId(
+                                @Suppress("deprecation")
+                                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, id),
+                                null, listOf(it), kRemove = true)
+                        }
+                    }
+                }
                 if (clazz == Playlist::class.java.name) {
                     topAppBar.inflateMenu(R.menu.playlist_subfragment_menu)
                     topAppBar.setOnMenuItemClickListener {
@@ -177,7 +199,8 @@ class GeneralSubFragment : BaseFragment(true) {
                 sharedTitle,
                 itemList,
                 rawOrderExposed = rawOrderExposed,
-                isSubFragment = itemType
+                isSubFragment = itemType,
+                kRemoveFromPlaylist = kRemoveFromPlaylist
             )
 
         recyclerView.enableEdgeToEdgePaddingListener()

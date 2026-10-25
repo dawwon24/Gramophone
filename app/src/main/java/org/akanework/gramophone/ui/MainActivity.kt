@@ -357,11 +357,13 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun addToPlaylist(uri: Uri?, name: File?, songs: List<Entry>) {
+    // Gramophone K: kRemove = remove these songs from the playlist instead (same write request flow)
+    fun addToPlaylist(uri: Uri?, name: File?, songs: List<Entry>, kRemove: Boolean = false) {
         val data = Bundle().apply {
             putParcelableArrayList("Songs", ArrayList(songs))
             putParcelable("Uri", uri)
             putString("Name", name?.path)
+            putBoolean("KRemove", kRemove)
         }
         CoroutineScope(Dispatchers.Default).launch {
             val token = if (uri != null) {
@@ -492,6 +494,13 @@ class MainActivity : BaseActivity() {
                     uriIn) else PlaylistSerializer.Playlist.create()
                 val uri = uriIn ?: ItemManipulator.createPlaylist(this,
                     File(name!!))
+                // Gramophone K: remove songs, see addToPlaylist()
+                if (uriIn != null && data.getBoolean("KRemove")) {
+                    ItemManipulator.setPlaylistContent(this, uri, readback.copy(entries = readback
+                        .entries.filter { songs.none { candidate -> candidate.fuzzyEquals(it) } }),
+                        false)
+                    return
+                }
                 // Gramophone K: songs already in the playlist are not added again
                 val entries = GramophoneK.distinctPlaylistEntries(readback.entries + songs)
                 ItemManipulator.setPlaylistContent(this, uri, readback
