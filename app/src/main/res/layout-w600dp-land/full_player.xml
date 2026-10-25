@@ -86,6 +86,25 @@
         app:layout_constraintVertical_bias="0.0"
         app:tooltipText="@string/add_to_playlist" />
 
+    <!-- Gramophone K: shuffle the songs after the current one -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/k_shuffle_upcoming"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/rp_buttons"
+        android:contentDescription="@string/k_shuffle_upcoming"
+        app:icon="@drawable/ic_shuffle"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="24dp"
+        app:iconTint="?attr/colorOnSurface"
+        android:layout_marginStart="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@id/k_add_to_playlist"
+        app:layout_constraintVertical_bias="0.0"
+        app:tooltipText="@string/k_shuffle_upcoming" />
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/album_cover_frame"
         android:layout_width="0dp"

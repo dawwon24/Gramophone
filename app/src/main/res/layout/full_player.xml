@@ -64,12 +64,30 @@
         app:iconSize="24dp"
         app:iconTint="?attr/colorOnSurface"
         app:layout_constraintBottom_toTopOf="@id/album_cover_frame"
-        app:layout_constraintEnd_toStartOf="@id/k_add_to_playlist"
+        app:layout_constraintEnd_toStartOf="@id/k_shuffle_upcoming"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@id/slide_down"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
         app:tooltipText="@string/timer" />
+
+    <!-- Gramophone K: shuffle the songs after the current one -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/k_shuffle_upcoming"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/rp_buttons"
+        android:contentDescription="@string/k_shuffle_upcoming"
+        app:icon="@drawable/ic_shuffle"
+        app:iconGravity="textStart"
+        app:iconPadding="0dp"
+        app:iconSize="24dp"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintBottom_toTopOf="@id/album_cover_frame"
+        app:layout_constraintEnd_toStartOf="@id/k_add_to_playlist"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:tooltipText="@string/k_shuffle_upcoming" />
 
     <!-- Gramophone K: add current song to a playlist -->
     <com.google.android.material.button.MaterialButton

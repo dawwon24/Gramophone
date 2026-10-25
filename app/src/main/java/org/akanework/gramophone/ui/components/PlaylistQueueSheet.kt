@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.stateIn
 import org.akanework.gramophone.R
-import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.dpToPx
 import org.akanework.gramophone.logic.getBooleanStrict
 import org.akanework.gramophone.logic.getQueueForUi
@@ -204,14 +203,6 @@ class PlaylistQueueSheet(
                             playlistAdapter.playlist.first.indexOfFirst { i ->
                                 i == (instance?.currentMediaItemIndex ?: 0)
                             }.takeIf { it != -1 }?.let { recyclerView.smoothScrollToPosition(it) }
-                        },
-                        // Gramophone K: shuffle the songs after the current one
-                        onKShuffle = {
-                            val player = instance
-                            if (player != null && !detachedHead.value &&
-                                GramophoneK.shuffleUpcoming(player)) {
-                                forceUpdate()
-                            }
                         }
                     )
                 }

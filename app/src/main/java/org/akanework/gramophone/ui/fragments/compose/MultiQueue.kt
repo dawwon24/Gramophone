@@ -568,16 +568,14 @@ fun BottomSheetActions(
     modifier: Modifier = Modifier,
     onDismiss: (() -> Unit)? = null,
     onRecyclerScrollTo: (() -> Unit)? = null,
-    onKShuffle: (() -> Unit)? = null, // Gramophone K
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth(),
     ) {
-        // Gramophone K: FlowRow, so the extra shuffle button wraps instead of being pushed off screen
-        FlowRow(
-            horizontalArrangement = Arrangement.Center
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             Button(
                 colors = ButtonDefaults.textButtonColors(),
@@ -609,22 +607,6 @@ fun BottomSheetActions(
                     stringResource(R.string.scroll_to_playing)
                 )
             }
-
-            // Gramophone K: shuffle the songs after the current one, once
-            if (onKShuffle != null) {
-                Button(
-                    colors = ButtonDefaults.textButtonColors(),
-                    onClick = onKShuffle
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_shuffle),
-                        contentDescription = null,
-                    )
-                    Text(
-                        stringResource(R.string.k_shuffle_upcoming)
-                    )
-                }
-            }
         }
 
         AndroidView(
@@ -645,7 +627,6 @@ fun QueueRoot(
     modifier: Modifier = Modifier,
     onDismiss: (() -> Unit)? = null,
     onRecyclerScrollTo: (() -> Unit)? = null,
-    onKShuffle: (() -> Unit)? = null, // Gramophone K
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -691,7 +672,6 @@ fun QueueRoot(
                         durationView = durationView,
                         onDismiss = onDismiss,
                         onRecyclerScrollTo = onRecyclerScrollTo,
-                        onKShuffle = onKShuffle,
                     )
                 }
             }

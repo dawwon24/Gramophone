@@ -45,6 +45,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Toast
 import android.widget.ListView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -124,6 +125,7 @@ import org.akanework.gramophone.logic.setTextAnimation
 import org.akanework.gramophone.logic.setTimer
 import org.akanework.gramophone.logic.startAnimation
 import org.akanework.gramophone.logic.updateMargin
+import org.akanework.gramophone.logic.GramophoneK
 import org.akanework.gramophone.logic.utils.AudioFormatDetector
 import org.akanework.gramophone.logic.utils.AudioFormatDetector.AudioFormatInfo
 import org.akanework.gramophone.logic.utils.AudioFormatDetector.AudioQuality
@@ -495,6 +497,13 @@ class FullBottomSheet
         findViewById<MaterialButton>(R.id.k_add_to_playlist).setOnClickListener {
             ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
             instance?.currentMediaItem?.let { item -> activity.addToPlaylistDialog(item) }
+        }
+        // Gramophone K: shuffle the songs after the current one, once
+        findViewById<MaterialButton>(R.id.k_shuffle_upcoming).setOnClickListener {
+            ViewCompat.performHapticFeedback(it, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
+            val player = instance ?: return@setOnClickListener
+            if (GramophoneK.shuffleUpcoming(player))
+                Toast.makeText(context, R.string.k_shuffled_upcoming, Toast.LENGTH_SHORT).show()
         }
         // Gramophone K: the playback speed button is reused as "stop and clear queue"
         bottomSheetPlaybackSpeedButton.setIconResource(R.drawable.baseline_delete_sweep_24)

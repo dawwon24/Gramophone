@@ -23,6 +23,7 @@
     <string name="k_clear_queue_confirm">Clear</string>
     <string name="k_play_only_this">Play only this song</string>
     <string name="k_shuffle_upcoming">Shuffle upcoming</string>
+    <string name="k_shuffled_upcoming">Shuffled the upcoming songs</string>
     <string name="k_remove_from_playlist">Remove from playlist</string>
     <string name="k_play_list_from_here">Play all from here</string>
     <string name="k_sort_song_count">Song count</string>
