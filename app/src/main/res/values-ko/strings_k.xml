@@ -22,6 +22,8 @@
     <string name="k_keep_current_only">현재 곡만 남기기</string>
     <string name="k_clear_queue_confirm">비우기</string>
     <!-- upstream string without Korean translation -->
+    <string name="clear_queue">목록 비우기</string>
+    <string name="scroll_to_playing">재생 중인 곡으로</string>
     <string name="timer_end_of_this_song">이 노래가 끝나면</string>
     <string name="k_play_only_this">이 노래만 재생</string>
     <string name="k_shuffle_upcoming">남은 곡 섞기</string>

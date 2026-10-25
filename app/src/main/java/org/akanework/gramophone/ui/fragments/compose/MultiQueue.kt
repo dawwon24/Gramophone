@@ -575,8 +575,9 @@ fun BottomSheetActions(
         modifier = modifier
             .fillMaxWidth(),
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround
+        // Gramophone K: FlowRow, so the extra shuffle button wraps instead of being pushed off screen
+        FlowRow(
+            horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 colors = ButtonDefaults.textButtonColors(),
