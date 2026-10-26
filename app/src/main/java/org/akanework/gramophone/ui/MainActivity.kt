@@ -559,6 +559,11 @@ class MainActivity : BaseActivity() {
 
     private fun doPlayFromIntent(intent: Intent) {
         Log.i("MainActivity", "doPlayFromIntent($intent)")
+        // Gramophone K: notification tap opens the full player
+        if (intent.getBooleanExtra(GramophoneK.EXTRA_OPEN_PLAYER, false)) {
+            intent.removeExtra(GramophoneK.EXTRA_OPEN_PLAYER)
+            playerBottomSheet.kOpenWhenReady()
+        }
         val autoPlayId = intent.extras?.getString(PLAYBACK_AUTO_PLAY_ID) ?: (if
                 (intent.action == "org.akanework.gramophone.action.PLAY_MEDIA_FROM_SUGGESTION")
                 intent.data?.let {

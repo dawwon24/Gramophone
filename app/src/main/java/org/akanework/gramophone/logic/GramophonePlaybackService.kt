@@ -530,7 +530,8 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                     PendingIntent.getActivity(
                         this,
                         PENDING_INTENT_SESSION_ID,
-                        Intent(this, MainActivity::class.java),
+                        Intent(this, MainActivity::class.java)
+                            .putExtra(GramophoneK.EXTRA_OPEN_PLAYER, true), // Gramophone K
                         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
                     )
                 )

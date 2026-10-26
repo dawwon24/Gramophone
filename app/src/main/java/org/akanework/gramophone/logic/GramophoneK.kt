@@ -40,6 +40,9 @@ object GramophoneK {
     const val PREF_CONFIRM_REPLACE_QUEUE = "k_confirm_replace_queue"
     const val PREF_ALBUM_MIN_SONGS = "k_album_min_songs"
 
+    /** Intent extra: open the full player (used by the media and paused-song notifications). */
+    const val EXTRA_OPEN_PLAYER = "KOpenPlayer"
+
     private const val CLICK_MODE_SINGLE = "single"
 
     /**

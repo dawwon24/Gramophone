@@ -125,6 +125,22 @@ class PlayerBottomSheet private constructor(
         }
     }
 
+    // Gramophone K: expand once the sheet is collapsed (on a cold start it is still hidden
+    // until the controller has loaded the queue)
+    private var kOpenPending = false
+    private val kOpenTimeout = Runnable { kOpenPending = false }
+
+    fun kOpenWhenReady() {
+        if (standardBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) return
+        if (standardBottomSheetBehavior?.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            open()
+            return
+        }
+        kOpenPending = true
+        handler.removeCallbacks(kOpenTimeout)
+        handler.postDelayed(kOpenTimeout, 5000)
+    }
+
     fun open() {
         if (standardBottomSheetBehavior!!.state == BottomSheetBehavior.STATE_COLLAPSED) {
             standardBottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
@@ -146,6 +162,11 @@ class PlayerBottomSheet private constructor(
                     fullPlayer.alpha = 0f
                     lyricsFrame.alpha = 0f
                     bottomSheetBackCallback!!.isEnabled = false
+                    if (kOpenPending) { // Gramophone K
+                        kOpenPending = false
+                        handler.removeCallbacks(kOpenTimeout)
+                        post { open() }
+                    }
                 }
 
                 BottomSheetBehavior.STATE_DRAGGING, BottomSheetBehavior.STATE_SETTLING -> {

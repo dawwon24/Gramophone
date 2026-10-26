@@ -166,7 +166,8 @@ class KPausedNotification(
     @SuppressLint("MissingPermission")
     private fun notify(state: State, cover: Bitmap?) {
         val open = PendingIntent.getActivity(
-            context, PENDING_INTENT_OPEN_ID, Intent(context, MainActivity::class.java),
+            context, PENDING_INTENT_OPEN_ID,
+            Intent(context, MainActivity::class.java).putExtra(GramophoneK.EXTRA_OPEN_PLAYER, true),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val title = state.metadata.title ?: state.metadata.displayTitle
