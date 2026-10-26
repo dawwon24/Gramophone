@@ -88,4 +88,9 @@
         <item quantity="other">Could not save %d songs</item>
     </plurals>
     <string name="k_tag_unsupported_format">Tag editing is not supported for this file format</string>
+    <string name="k_paused_channel">Paused song</string>
+    <string name="k_paused_state">Paused</string>
+    <string name="k_paused_play">Play</string>
+    <string name="k_paused_previous">Previous</string>
+    <string name="k_paused_next">Next</string>
 </resources>

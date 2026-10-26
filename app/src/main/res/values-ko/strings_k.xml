@@ -71,4 +71,9 @@
         <item quantity="other">%d곡을 저장하지 못했습니다</item>
     </plurals>
     <string name="k_tag_unsupported_format">이 파일 형식은 태그를 수정할 수 없습니다</string>
+    <string name="k_paused_channel">일시정지된 곡</string>
+    <string name="k_paused_state">일시정지됨</string>
+    <string name="k_paused_play">재생</string>
+    <string name="k_paused_previous">이전 곡</string>
+    <string name="k_paused_next">다음 곡</string>
 </resources>

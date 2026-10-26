@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gramophone K: expanded "paused" notification (KPausedNotification) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/k_paused_title"
+        style="@style/TextAppearance.Compat.Notification.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/k_paused_artist"
+        style="@style/TextAppearance.Compat.Notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true" />
+
+    <ProgressBar
+        android:id="@+id/k_paused_progress"
+        style="@android:style/Widget.Material.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/k_paused_previous"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/k_paused_previous"
+            android:src="@drawable/k_notif_previous"
+            android:tint="?android:attr/textColorPrimary" />
+
+        <ImageButton
+            android:id="@+id/k_paused_play"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="24dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/k_paused_play"
+            android:src="@drawable/k_notif_play"
+            android:tint="?android:attr/textColorPrimary" />
+
+        <ImageButton
+            android:id="@+id/k_paused_next"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/k_paused_next"
+            android:src="@drawable/k_notif_next"
+            android:tint="?android:attr/textColorPrimary" />
+    </LinearLayout>
+</LinearLayout>

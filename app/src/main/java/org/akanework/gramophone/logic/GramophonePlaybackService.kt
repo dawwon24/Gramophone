@@ -205,6 +205,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     private lateinit var mainExecutor: Executor
     private lateinit var playbackHandler: Handler
     private lateinit var nm: NotificationManagerCompat
+    private lateinit var kPausedNotification: KPausedNotification // Gramophone K
     private lateinit var lastPlayedManager: LastPlayedManager
     private lateinit var prefs: SharedPreferences
     private var lastSentHighlightedLyric: String? = null
@@ -302,6 +303,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
         handler = Handler(Looper.getMainLooper())
         mainExecutor = ContextCompat.getMainExecutor(this)
         nm = NotificationManagerCompat.from(this)
+        kPausedNotification = KPausedNotification(this, handler) { mediaSession?.bitmapLoader } // Gramophone K
         prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         qb = QueueBoard(this)
         setListener(this)
@@ -768,6 +770,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
     // alongside with the mediaSession.
     override fun onDestroy() {
         Log.i(TAG, "+onDestroy()")
+        kPausedNotification.release() // Gramophone K
         instanceForWidgetAndLyricsOnly = null
         unregisterReceiver(seekReceiver)
         unregisterReceiver(btReceiver)
@@ -1446,6 +1449,13 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
 
     override fun onEvents(player: Player, events: Player.Events) {
         super<Player.Listener>.onEvents(player, events)
+        // Gramophone K
+        if (events.containsAny(
+                Player.EVENT_PLAY_WHEN_READY_CHANGED, Player.EVENT_PLAYBACK_STATE_CHANGED,
+                Player.EVENT_MEDIA_ITEM_TRANSITION, Player.EVENT_MEDIA_METADATA_CHANGED,
+                Player.EVENT_TIMELINE_CHANGED, Player.EVENT_POSITION_DISCONTINUITY
+            )
+        ) kPausedNotification.update(player)
         // if timeline changed, shuffle order is handled elsewhere instead (cloneAndInsert called by
         // ExoPlayer for common case and nextShuffleOrder for resumption case)
         if (events.contains(Player.EVENT_SHUFFLE_MODE_ENABLED_CHANGED)
