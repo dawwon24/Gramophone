@@ -813,7 +813,9 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
             || session.isAutoCompanionController(controller)
             || session.isAutomotiveController(controller)
         ) {
-            if (this.controller?.currentTimeline?.isEmpty == false) {
+            // Gramophone K: no repeat/shuffle buttons in the system media panel, so it shows
+            // the default previous / play / next buttons
+            if (false && this.controller?.currentTimeline?.isEmpty == false) {
                 builder.setMediaButtonPreferences(
                     ImmutableList.of(
                         getRepeatCommand(),
@@ -1584,7 +1586,7 @@ class GramophonePlaybackService : MediaLibraryService(), MediaSessionService.Lis
                 || mediaSession!!.isAutomotiveController(it)
             ) {
                 mediaSession!!.setMediaButtonPreferences(
-                    it, if (isEmpty) emptyList() else
+                    it, if (isEmpty || true) emptyList() else // Gramophone K: see onConnect
                         ImmutableList.of(getRepeatCommand(), getShufflingCommand())
                 )
             }
